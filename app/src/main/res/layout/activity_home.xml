@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Ícone de perfil -->
+    <ImageView
+        android:id="@+id/profileIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/perfil"
+        android:contentDescription="Perfil" />
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/viagensTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Viagens"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="64dp" />
+    <Button
+        android:id="@+id/btnCriar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CRIAR ＋"
+        android:textColor="#000000"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:layout_below="@id/viagensTitle"
+        android:layout_marginTop="24dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/border_button"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnFiltros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FILTROS ＋"
+        android:textColor="#000000"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:layout_below="@id/btnCriar"
+        android:layout_alignEnd="@id/profileIcon"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/border_button"
+        android:textAllCaps="false" />
+
+
+    <!-- Lista de Viagens -->
+    <ListView
+        android:id="@+id/viagensListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnFiltros"
+        android:layout_marginTop="24dp"
+        android:divider="#FFD39B"
+        android:dividerHeight="2dp"
+        android:paddingBottom="16dp" />
+
+</RelativeLayout>
