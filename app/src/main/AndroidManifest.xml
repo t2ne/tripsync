@@ -37,5 +37,13 @@
             android:name=".HomeActivity"
             android:exported="false" />
 
+        <activity android:name=".EditarPerfilActivity"
+            android:exported="false"/>
+
+        <activity android:name=".CriarViagemActivity"
+            android:exported="false"/>
+
+
+
     </application>
 </manifest>

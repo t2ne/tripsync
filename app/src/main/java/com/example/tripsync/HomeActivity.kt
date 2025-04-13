@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var viagensListView: ListView
-    private val viagens = listOf("Vila do Carmo", "Viana do Castelo", "Braga", "Ponte de Lima")
+    private val viagens = mutableListOf("Vila do Carmo", "Viana do Castelo", "Braga", "Ponte de Lima")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,13 +19,32 @@ class HomeActivity : AppCompatActivity() {
         val adapter = ViagemAdapter()
         viagensListView.adapter = adapter
 
+        // Botão CRIAR
         findViewById<Button>(R.id.btnCriar).setOnClickListener {
             Toast.makeText(this, "Criar nova viagem", Toast.LENGTH_SHORT).show()
         }
-
+        // Botão CRIAR
+        findViewById<Button>(R.id.btnCriar).setOnClickListener {
+            Toast.makeText(this, "Criar nova viagem", Toast.LENGTH_SHORT).show()
+        }
+        // Botão FILTROS
         findViewById<Button>(R.id.btnFiltros).setOnClickListener {
             Toast.makeText(this, "Abrir filtros", Toast.LENGTH_SHORT).show()
         }
+
+        // Botão CRIAR abre a CriarViagemActivity
+        findViewById<Button>(R.id.btnCriar).setOnClickListener {
+            val intent = Intent(this, CriarViagemActivity::class.java)
+            startActivity(intent)
+        }
+
+        val profileIcon = findViewById<ImageView>(R.id.profileIcon)
+        profileIcon.setOnClickListener {
+            Toast.makeText(this, "Ícone de perfil clicado!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, EditarPerfilActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     inner class ViagemAdapter : BaseAdapter() {
