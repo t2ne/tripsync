@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -13,9 +12,9 @@
         android:theme="@style/Theme.Tripsync"
         tools:targetApi="31">
 
-        <!-- Tela principal (Login) -->
+        <!-- Tela de introdução (primeira a abrir) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".IntroActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +22,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Tela de login -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+
         <!-- Tela Home -->
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-    </application>
 
+    </application>
 </manifest>
