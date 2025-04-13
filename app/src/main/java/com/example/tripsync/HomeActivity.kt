@@ -65,8 +65,26 @@ class HomeActivity : AppCompatActivity() {
             }
 
             btnApagar.setOnClickListener {
-                Toast.makeText(this@HomeActivity, "Apagar: ${viagens[position]}", Toast.LENGTH_SHORT).show()
+                val alertDialog = android.app.AlertDialog.Builder(this@HomeActivity)
+                    .setMessage("TEM A CERTEZA QUE DESEJA ELEMINAR?")
+                    .setPositiveButton("SIM") { dialog, _ ->
+                        viagens.removeAt(position)
+                        notifyDataSetChanged()
+                        Toast.makeText(this@HomeActivity, "Viagem eliminada", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("NÃO") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+
+                alertDialog.show()
+
+                // Estilizar os botões como na imagem (opcional)
+                alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.setAllCaps(true)
+                alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setAllCaps(true)
             }
+
 
             return view
         }
