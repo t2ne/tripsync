@@ -2,6 +2,7 @@ package com.example.tripsync
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -10,27 +11,21 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var viagensListView: ListView
     private val viagens = mutableListOf("Vila do Carmo", "Viana do Castelo", "Braga", "Ponte de Lima")
+    private lateinit var adapter: ViagemAdapter
+    private lateinit var btnFiltros: Button
+    private lateinit var spinnerFiltro: Spinner // Declaração do Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         viagensListView = findViewById(R.id.viagensListView)
-        val adapter = ViagemAdapter()
-        viagensListView.adapter = adapter
+        spinnerFiltro = findViewById(R.id.spinnerFiltro) // Atribuição do Spinner
+        btnFiltros = findViewById(R.id.btnFiltros)
 
-        // Botão CRIAR
-        findViewById<Button>(R.id.btnCriar).setOnClickListener {
-            Toast.makeText(this, "Criar nova viagem", Toast.LENGTH_SHORT).show()
-        }
-        // Botão CRIAR
-        findViewById<Button>(R.id.btnCriar).setOnClickListener {
-            Toast.makeText(this, "Criar nova viagem", Toast.LENGTH_SHORT).show()
-        }
-        // Botão FILTROS
-        findViewById<Button>(R.id.btnFiltros).setOnClickListener {
-            Toast.makeText(this, "Abrir filtros", Toast.LENGTH_SHORT).show()
-        }
+        // Adapter para lista de viagens
+        adapter = ViagemAdapter()
+        viagensListView.adapter = adapter
 
         // Botão CRIAR abre a CriarViagemActivity
         findViewById<Button>(R.id.btnCriar).setOnClickListener {
@@ -38,13 +33,47 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Botão FILTROS
+        btnFiltros.setOnClickListener {
+            val filtroOptions = arrayOf("Crescente", "Descrescente")
+            val adapterFiltro = ArrayAdapter(this, android.R.layout.simple_spinner_item, filtroOptions)
+            adapterFiltro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerFiltro.adapter = adapterFiltro
+
+            // Alterna a visibilidade do spinner
+            spinnerFiltro.visibility = if (spinnerFiltro.visibility == View.GONE) View.VISIBLE else View.GONE
+        }
+
+        // Configurar o spinner para ordenar as viagens
+        spinnerFiltro.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                when (position) {
+                    0 -> sortViagensCrescente() // Ordenar Crescente
+                    1 -> sortViagensDecrescente() // Ordenar Decrescente
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        // Ícone de perfil abre EditarPerfilActivity
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
         profileIcon.setOnClickListener {
-            Toast.makeText(this, "Ícone de perfil clicado!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, EditarPerfilActivity::class.java)
             startActivity(intent)
         }
+    }
 
+    private fun sortViagensCrescente() {
+        // Ordenar em ordem crescente (A-Z)
+        viagens.sort()
+        adapter.notifyDataSetChanged() // Notifica o adapter para atualizar a lista
+    }
+
+    private fun sortViagensDecrescente() {
+        // Ordenar em ordem decrescente (Z-A)
+        viagens.sortDescending()
+        adapter.notifyDataSetChanged() // Notifica o adapter para atualizar a lista
     }
 
     inner class ViagemAdapter : BaseAdapter() {
@@ -60,10 +89,14 @@ class HomeActivity : AppCompatActivity() {
 
             nomeViagem.text = viagens[position]
 
+            // Botão Editar: abre EditarViagemActivity com nome da viagem
             btnEditar.setOnClickListener {
-                Toast.makeText(this@HomeActivity, "Editar: ${viagens[position]}", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@HomeActivity, EditarViagemActivity::class.java)
+                intent.putExtra("nomeViagem", viagens[position])
+                startActivity(intent)
             }
 
+            // Botão Apagar: mostra confirmação com AlertDialog
             btnApagar.setOnClickListener {
                 val alertDialog = android.app.AlertDialog.Builder(this@HomeActivity)
                     .setMessage("TEM A CERTEZA QUE DESEJA ELEMINAR?")
@@ -80,11 +113,10 @@ class HomeActivity : AppCompatActivity() {
 
                 alertDialog.show()
 
-                // Estilizar os botões como na imagem (opcional)
+                // Estilo dos botões (opcional)
                 alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.setAllCaps(true)
                 alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setAllCaps(true)
             }
-
 
             return view
         }

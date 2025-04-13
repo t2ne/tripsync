@@ -43,6 +43,8 @@
         <activity android:name=".CriarViagemActivity"
             android:exported="false"/>
 
+        <activity android:name=".EditarViagemActivity"
+            android:exported="false"/>
 
 
     </application>

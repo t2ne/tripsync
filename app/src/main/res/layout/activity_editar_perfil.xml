@@ -9,6 +9,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
+
+        <!-- Botão Voltar -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -17,6 +19,8 @@
             android:layout_gravity="start|top"
             android:contentDescription="Voltar"
             android:src="@drawable/back" />
+
+        <!-- Título -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,6 +28,27 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal" />
+
+
+
+        <!-- Exibição da Foto de Perfil -->
+        <ImageView
+            android:id="@+id/imgPerfil"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/logo"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"/>
+
+        <!-- Botão para selecionar a foto -->
+        <Button
+            android:id="@+id/btnSelecionarFotoPerfil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selecionar Foto de Perfil"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
 
         <!-- Campos de exemplo -->
         <EditText
