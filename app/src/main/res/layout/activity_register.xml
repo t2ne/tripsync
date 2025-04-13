@@ -1,60 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center"
     android:background="#FFFFFF">
 
+    <!-- Botão de Voltar no topo esquerdo -->
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="start"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="start|top"
         android:contentDescription="Voltar"
         android:src="@drawable/back" />
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/perfil"
-        android:contentDescription="Ícone utilizador" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="REGISTO"
-        android:textStyle="bold"
-        android:textSize="24sp"
-        android:layout_marginTop="8dp" />
-
-    <EditText
-        android:id="@+id/registerEmail"
+    <!-- Layout com os outros elementos -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email"
-        android:background="#eeeeee"
-        android:padding="12dp"
-        android:layout_marginTop="24dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-    <EditText
-        android:id="@+id/registerPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Palavra-Passe"
-        android:inputType="textPassword"
-        android:background="#eeeeee"
-        android:padding="12dp"
-        android:layout_marginTop="12dp" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/perfil"
+            android:contentDescription="Ícone utilizador" />
 
-    <Button
-        android:id="@+id/btnRegistar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="REGISTAR"
-        android:layout_marginTop="24dp"
-        android:backgroundTint="#1976D2"
-        android:textColor="#FFFFFF" />
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REGISTO"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:layout_marginTop="8dp" />
+
+        <EditText
+            android:id="@+id/registerEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:background="#eeeeee"
+            android:padding="12dp"
+            android:layout_marginTop="24dp" />
+
+        <EditText
+            android:id="@+id/registerPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Palavra-Passe"
+            android:inputType="textPassword"
+            android:background="#eeeeee"
+            android:padding="12dp"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btnRegistar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REGISTAR"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#1976D2"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+</FrameLayout>
