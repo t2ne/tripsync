@@ -27,6 +27,11 @@
             android:name=".MainActivity"
             android:exported="true" />
 
+        <!-- Tela de registo -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true" />
+
         <!-- Tela Home -->
         <activity
             android:name=".HomeActivity"

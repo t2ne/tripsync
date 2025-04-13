@@ -25,23 +25,19 @@ class MainActivity : AppCompatActivity() {
             val password = passwordInput.text.toString()
             Toast.makeText(this, "Login com: $email", Toast.LENGTH_SHORT).show()
 
-
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-
         registerButton.setOnClickListener {
-            Toast.makeText(this, "Ir para registro", Toast.LENGTH_SHORT).show()
 
-
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
 
         forgotPassword.setOnClickListener {
             Toast.makeText(this, "Recuperar palavra-passe", Toast.LENGTH_SHORT).show()
-
-
         }
     }
 }
