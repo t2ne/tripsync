@@ -6,22 +6,42 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var viagensListView: ListView
-    private val viagens = mutableListOf("Vila do Carmo", "Viana do Castelo", "Braga", "Ponte de Lima")
+    private val viagens = mutableListOf<Viagem>()
     private lateinit var adapter: ViagemAdapter
     private lateinit var btnFiltros: Button
-    private lateinit var spinnerFiltro: Spinner // Declaração do Spinner
+    private lateinit var spinnerFiltro: Spinner
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        // Inicializar Firebase
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         viagensListView = findViewById(R.id.viagensListView)
-        spinnerFiltro = findViewById(R.id.spinnerFiltro) // Atribuição do Spinner
+        spinnerFiltro = findViewById(R.id.spinnerFiltro)
         btnFiltros = findViewById(R.id.btnFiltros)
+
+        // Verificar se o usuário está logado
+        if (auth.currentUser == null) {
+            // Redirecionar para login
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
+        // Carregar viagens do usuário do Firestore
+        carregarViagens()
 
         // Adapter para lista de viagens
         adapter = ViagemAdapter()
@@ -30,7 +50,7 @@ class HomeActivity : AppCompatActivity() {
         // Botão CRIAR abre a CriarViagemActivity
         findViewById<Button>(R.id.btnCriar).setOnClickListener {
             val intent = Intent(this, CriarViagemActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CREATE_TRIP)
         }
 
         // Botão FILTROS
@@ -48,8 +68,8 @@ class HomeActivity : AppCompatActivity() {
         spinnerFiltro.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 when (position) {
-                    0 -> sortViagensCrescente() // Ordenar Crescente
-                    1 -> sortViagensDecrescente() // Ordenar Decrescente
+                    0 -> sortViagensCrescente()
+                    1 -> sortViagensDecrescente()
                 }
             }
 
@@ -64,16 +84,44 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun carregarViagens() {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("usuarios")
+            .document(userId)
+            .collection("viagens")
+            .get()
+            .addOnSuccessListener { documents ->
+                viagens.clear()
+                for (document in documents) {
+                    val viagem = document.toObject(Viagem::class.java)
+                    viagem.id = document.id
+                    viagens.add(viagem)
+                }
+                adapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Erro ao carregar viagens: ${exception.message}",
+                    Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun sortViagensCrescente() {
-        // Ordenar em ordem crescente (A-Z)
-        viagens.sort()
-        adapter.notifyDataSetChanged() // Notifica o adapter para atualizar a lista
+        viagens.sortBy { it.nome }
+        adapter.notifyDataSetChanged()
     }
 
     private fun sortViagensDecrescente() {
-        // Ordenar em ordem decrescente (Z-A)
-        viagens.sortDescending()
-        adapter.notifyDataSetChanged() // Notifica o adapter para atualizar a lista
+        viagens.sortByDescending { it.nome }
+        adapter.notifyDataSetChanged()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CREATE_TRIP && resultCode == RESULT_OK) {
+            // Recarregar viagens após criar uma nova
+            carregarViagens()
+        }
     }
 
     inner class ViagemAdapter : BaseAdapter() {
@@ -81,18 +129,19 @@ class HomeActivity : AppCompatActivity() {
         override fun getItem(position: Int): Any = viagens[position]
         override fun getItemId(position: Int): Long = position.toLong()
 
-        override fun getView(position: Int, convertView: android.view.View?, parent: ViewGroup): android.view.View {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = layoutInflater.inflate(R.layout.item_viagem, parent, false)
             val nomeViagem = view.findViewById<TextView>(R.id.nomeViagem)
             val btnEditar = view.findViewById<ImageButton>(R.id.btnEditar)
             val btnApagar = view.findViewById<ImageButton>(R.id.btnApagar)
 
-            nomeViagem.text = viagens[position]
+            nomeViagem.text = viagens[position].nome
 
             // Botão Editar: abre EditarViagemActivity com nome da viagem
             btnEditar.setOnClickListener {
                 val intent = Intent(this@HomeActivity, EditarViagemActivity::class.java)
-                intent.putExtra("nomeViagem", viagens[position])
+                intent.putExtra("nomeViagem", viagens[position].nome)
+                intent.putExtra("viagemId", viagens[position].id)
                 startActivity(intent)
             }
 
@@ -101,9 +150,8 @@ class HomeActivity : AppCompatActivity() {
                 val alertDialog = android.app.AlertDialog.Builder(this@HomeActivity)
                     .setMessage("TEM A CERTEZA QUE DESEJA ELEMINAR?")
                     .setPositiveButton("SIM") { dialog, _ ->
-                        viagens.removeAt(position)
-                        notifyDataSetChanged()
-                        Toast.makeText(this@HomeActivity, "Viagem eliminada", Toast.LENGTH_SHORT).show()
+                        // Remover do Firestore
+                        removerViagem(viagens[position].id)
                         dialog.dismiss()
                     }
                     .setNegativeButton("NÃO") { dialog, _ ->
@@ -121,4 +169,36 @@ class HomeActivity : AppCompatActivity() {
             return view
         }
     }
+
+    private fun removerViagem(id: String) {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("usuarios")
+            .document(userId)
+            .collection("viagens")
+            .document(id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Viagem eliminada", Toast.LENGTH_SHORT).show()
+                carregarViagens() // Recarregar a lista
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Erro ao eliminar viagem: ${e.message}",
+                    Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    companion object {
+        private const val REQUEST_CREATE_TRIP = 100
+    }
 }
+
+// Modelo de dados para a Viagem
+data class Viagem(
+    var id: String = "",
+    val nome: String = "",
+    val data: String = "",
+    val descricao: String = "",
+    val classificacao: String = "",
+    val fotoUrl: String = ""
+)

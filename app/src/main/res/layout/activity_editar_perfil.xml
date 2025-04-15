@@ -29,8 +29,6 @@
             android:textStyle="bold"
             android:layout_gravity="center_horizontal" />
 
-
-
         <!-- Exibição da Foto de Perfil -->
         <ImageView
             android:id="@+id/imgPerfil"
@@ -52,23 +50,27 @@
 
         <!-- Campos de exemplo -->
         <EditText
+            android:id="@+id/etNome"
             android:hint="Nome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"/>
 
         <EditText
+            android:id="@+id/etUsername"
             android:hint="Username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:id="@+id/etEmail"
             android:hint="Email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"/>
 
         <EditText
+            android:id="@+id/etPassword"
             android:hint="Password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,6 +83,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"/>
+
+        <!-- Botão de Logout -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Terminar Sessão"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FF5722"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 </ScrollView>
