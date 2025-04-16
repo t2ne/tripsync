@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
@@ -23,56 +24,62 @@
         android:layout_below="@id/profileIcon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-         android:text="Viagens"
+        android:text="VIAGENS"
+        android:textColor="#000000"
         android:textSize="28sp"
         android:textStyle="bold" />
 
-    <!-- Botão CRIAR -->
-    <Button
-        android:id="@+id/btnCriar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CRIAR ＋"
-        android:textColor="#000000"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:layout_below="@id/viagensTitle"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/border_button"
-        android:textAllCaps="false"
-        android:layout_marginTop="32dp" />
-
-    <!-- Botão FILTROS -->
-    <Button
-        android:id="@+id/btnFiltros"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="FILTROS ＋"
-        android:textColor="#000000"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:layout_below="@id/btnCriar"
-        android:layout_alignEnd="@id/profileIcon"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/border_button"
-        android:textAllCaps="false" />
-    <!-- Adicionando o Spinner para os filtros -->
-    <Spinner
-        android:id="@+id/spinnerFiltro"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-    android:layout_marginTop="16dp" />
-
-    <!-- Lista de Viagens -->
-    <ListView
-        android:id="@+id/viagensListView"
+    <LinearLayout
+        android:id="@+id/buttonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btnFiltros"
-        android:layout_marginTop="24dp"
-        android:divider="#FFD39B"
-        android:dividerHeight="2dp"
-        android:paddingBottom="16dp" />
+        android:layout_below="@id/viagensTitle"
+        android:layout_marginTop="32dp"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnFiltros"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="FILTROS +"
+            android:textColor="#000000"
+            android:background="@drawable/border_button"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnCriar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CRIAR ＋"
+            android:textColor="#000000"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:background="@drawable/border_button"
+            android:textAllCaps="false"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- ordenar -->
+    <Spinner
+        android:id="@+id/spinnerFiltro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonContainer"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="22dp"
+        android:visibility="gone" />
+
+    <!-- RecyclerView em vez de ListView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/viagensRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/spinnerFiltro"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp" />
 
 </RelativeLayout>

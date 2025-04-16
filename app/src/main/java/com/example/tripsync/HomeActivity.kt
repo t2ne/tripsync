@@ -1,17 +1,41 @@
 package com.example.tripsync
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+data class Viagem(
+    var id: String = "",
+    val nome: String = "",
+    val data: String = "",
+    val descricao: String = "",
+    val classificacao: String = "",
+    val fotoUrl: String = ""
+)
+
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var viagensListView: ListView
+    private lateinit var viagensRecyclerView: RecyclerView
     private val viagens = mutableListOf<Viagem>()
     private lateinit var adapter: ViagemAdapter
     private lateinit var btnFiltros: Button
@@ -28,7 +52,7 @@ class HomeActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        viagensListView = findViewById(R.id.viagensListView)
+        viagensRecyclerView = findViewById(R.id.viagensRecyclerView)
         spinnerFiltro = findViewById(R.id.spinnerFiltro)
         btnFiltros = findViewById(R.id.btnFiltros)
 
@@ -40,12 +64,11 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
+        // Configurar RecyclerView
+        setupRecyclerView()
+
         // Carregar viagens do usuário do Firestore
         carregarViagens()
-
-        // Adapter para lista de viagens
-        adapter = ViagemAdapter()
-        viagensListView.adapter = adapter
 
         // Botão CRIAR abre a CriarViagemActivity
         findViewById<Button>(R.id.btnCriar).setOnClickListener {
@@ -54,6 +77,34 @@ class HomeActivity : AppCompatActivity() {
         }
 
         // Botão FILTROS
+        setupFiltros()
+
+        // Ícone de perfil abre EditarPerfilActivity
+        val profileIcon = findViewById<ImageView>(R.id.profileIcon)
+        profileIcon.setOnClickListener {
+            val intent = Intent(this, EditarPerfilActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun setupRecyclerView() {
+        adapter = ViagemAdapter(viagens) { viagem ->
+            // Clique no item abre a tela de edição
+            val intent = Intent(this@HomeActivity, EditarViagemActivity::class.java)
+            intent.putExtra("nomeViagem", viagem.nome)
+            intent.putExtra("viagemId", viagem.id)
+            startActivity(intent)
+        }
+
+        viagensRecyclerView.layoutManager = LinearLayoutManager(this)
+        viagensRecyclerView.adapter = adapter
+
+        // Configurar o ItemTouchHelper para suportar swipe
+        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback())
+        itemTouchHelper.attachToRecyclerView(viagensRecyclerView)
+    }
+
+    private fun setupFiltros() {
         btnFiltros.setOnClickListener {
             val filtroOptions = arrayOf("Crescente", "Descrescente")
             val adapterFiltro = ArrayAdapter(this, android.R.layout.simple_spinner_item, filtroOptions)
@@ -61,7 +112,13 @@ class HomeActivity : AppCompatActivity() {
             spinnerFiltro.adapter = adapterFiltro
 
             // Alterna a visibilidade do spinner
-            spinnerFiltro.visibility = if (spinnerFiltro.visibility == View.GONE) View.VISIBLE else View.GONE
+            if (spinnerFiltro.visibility == View.GONE) {
+                spinnerFiltro.visibility = View.VISIBLE
+                btnFiltros.text = "FILTROS v"
+            } else {
+                spinnerFiltro.visibility = View.GONE
+                btnFiltros.text = "FILTROS +"
+            }
         }
 
         // Configurar o spinner para ordenar as viagens
@@ -75,13 +132,6 @@ class HomeActivity : AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
-
-        // Ícone de perfil abre EditarPerfilActivity
-        val profileIcon = findViewById<ImageView>(R.id.profileIcon)
-        profileIcon.setOnClickListener {
-            val intent = Intent(this, EditarPerfilActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     private fun carregarViagens() {
@@ -94,8 +144,15 @@ class HomeActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 viagens.clear()
                 for (document in documents) {
-                    val viagem = document.toObject(Viagem::class.java)
-                    viagem.id = document.id
+                    val viagemMap = document.data
+                    val viagem = Viagem(
+                        id = document.id,
+                        nome = viagemMap["nome"] as? String ?: "",
+                        data = viagemMap["data"] as? String ?: "",
+                        descricao = viagemMap["descricao"] as? String ?: "",
+                        classificacao = viagemMap["classificacao"] as? String ?: "",
+                        fotoUrl = viagemMap["fotoUrl"] as? String ?: ""
+                    )
                     viagens.add(viagem)
                 }
                 adapter.notifyDataSetChanged()
@@ -116,6 +173,45 @@ class HomeActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    private fun removerViagem(position: Int) {
+        val userId = auth.currentUser?.uid ?: return
+        val viagemId = viagens[position].id
+        val viagemRemovida = viagens[position]
+
+        // Remover da lista local primeiro para atualização imediata da UI
+        viagens.removeAt(position)
+        adapter.notifyItemRemoved(position)
+
+        // Remover do Firestore
+        db.collection("usuarios")
+            .document(userId)
+            .collection("viagens")
+            .document(viagemId)
+            .delete()
+            .addOnSuccessListener {
+                Snackbar.make(viagensRecyclerView, "Viagem removida com sucesso", Snackbar.LENGTH_LONG)
+                    .setAction("DESFAZER") {
+                        // Restaurar viagem na posição
+                        viagens.add(position, viagemRemovida)
+                        adapter.notifyItemInserted(position)
+
+                        // Re-inserir no Firestore
+                        db.collection("usuarios")
+                            .document(userId)
+                            .collection("viagens")
+                            .document(viagemId)
+                            .set(viagemRemovida)
+                    }
+                    .show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Erro ao remover viagem: ${e.message}", Toast.LENGTH_SHORT).show()
+                // Restaurar na UI se falhar no Firestore
+                viagens.add(position, viagemRemovida)
+                adapter.notifyItemInserted(position)
+            }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CREATE_TRIP && resultCode == RESULT_OK) {
@@ -124,81 +220,109 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    inner class ViagemAdapter : BaseAdapter() {
-        override fun getCount(): Int = viagens.size
-        override fun getItem(position: Int): Any = viagens[position]
-        override fun getItemId(position: Int): Long = position.toLong()
+    // Adapter do RecyclerView
+    inner class ViagemAdapter(
+        private val viagens: List<Viagem>,
+        private val onItemClick: (Viagem) -> Unit
+    ) : RecyclerView.Adapter<ViagemAdapter.ViagemViewHolder>() {
 
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = layoutInflater.inflate(R.layout.item_viagem, parent, false)
-            val nomeViagem = view.findViewById<TextView>(R.id.nomeViagem)
-            val btnEditar = view.findViewById<ImageButton>(R.id.btnEditar)
-            val btnApagar = view.findViewById<ImageButton>(R.id.btnApagar)
-
-            nomeViagem.text = viagens[position].nome
-
-            // Botão Editar: abre EditarViagemActivity com nome da viagem
-            btnEditar.setOnClickListener {
-                val intent = Intent(this@HomeActivity, EditarViagemActivity::class.java)
-                intent.putExtra("nomeViagem", viagens[position].nome)
-                intent.putExtra("viagemId", viagens[position].id)
-                startActivity(intent)
-            }
-
-            // Botão Apagar: mostra confirmação com AlertDialog
-            btnApagar.setOnClickListener {
-                val alertDialog = android.app.AlertDialog.Builder(this@HomeActivity)
-                    .setMessage("TEM A CERTEZA QUE DESEJA ELEMINAR?")
-                    .setPositiveButton("SIM") { dialog, _ ->
-                        // Remover do Firestore
-                        removerViagem(viagens[position].id)
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("NÃO") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create()
-
-                alertDialog.show()
-
-                // Estilo dos botões (opcional)
-                alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.setAllCaps(true)
-                alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setAllCaps(true)
-            }
-
-            return view
+        inner class ViagemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val nomeViagem: TextView = view.findViewById(R.id.nomeViagem)
+            val dataViagem: TextView = view.findViewById(R.id.dataViagem)
+            val container: View = view.findViewById(R.id.itemContainer)
         }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViagemViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_viagem_swipe, parent, false)
+            return ViagemViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViagemViewHolder, position: Int) {
+            val viagem = viagens[position]
+
+            holder.nomeViagem.text = viagem.nome
+            holder.dataViagem.text = viagem.data
+
+            // Configurar o clique no item para editar
+            holder.container.setOnClickListener {
+                onItemClick(viagem)
+            }
+        }
+
+        override fun getItemCount() = viagens.size
     }
 
-    private fun removerViagem(id: String) {
-        val userId = auth.currentUser?.uid ?: return
+    // Implementação do callback para suportar swipe para excluir
+    inner class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(
+        0, ItemTouchHelper.LEFT
+    ) {
+        private val deleteIcon = getDrawable(R.drawable.ic_delete)
+        private val background = ColorDrawable(Color.RED)
 
-        db.collection("usuarios")
-            .document(userId)
-            .collection("viagens")
-            .document(id)
-            .delete()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Viagem eliminada", Toast.LENGTH_SHORT).show()
-                carregarViagens() // Recarregar a lista
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return false // Não suportamos arrastar/reordenar
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = viewHolder.adapterPosition
+
+            // Confirmar antes de remover
+            AlertDialog.Builder(this@HomeActivity)
+                .setTitle("Remover Viagem")
+                .setMessage("Tem certeza que deseja remover esta viagem?")
+                .setPositiveButton("Sim") { _, _ ->
+                    removerViagem(position)
+                }
+                .setNegativeButton("Cancelar") { _, _ ->
+                    // Se cancelar, restaurar o item na posição
+                    adapter.notifyItemChanged(position)
+                }
+                .show()
+        }
+
+        override fun onChildDraw(
+            c: Canvas,
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            dX: Float,
+            dY: Float,
+            actionState: Int,
+            isCurrentlyActive: Boolean
+        ) {
+            val itemView = viewHolder.itemView
+            val iconMargin = (itemView.height - (deleteIcon?.intrinsicHeight ?: 0)) / 2
+
+            // Desenhar fundo vermelho
+            background.setBounds(
+                itemView.right + dX.toInt(),
+                itemView.top,
+                itemView.right,
+                itemView.bottom
+            )
+            background.draw(c)
+
+            // Calcular posição do ícone
+            deleteIcon?.let {
+                val iconTop = itemView.top + (itemView.height - it.intrinsicHeight) / 2
+                val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
+                val iconRight = itemView.right - iconMargin
+                val iconBottom = iconTop + it.intrinsicHeight
+
+                // Definir limites do ícone
+                it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                it.draw(c)
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao eliminar viagem: ${e.message}",
-                    Toast.LENGTH_SHORT).show()
-            }
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        }
     }
 
     companion object {
         private const val REQUEST_CREATE_TRIP = 100
     }
 }
-
-// Modelo de dados para a Viagem
-data class Viagem(
-    var id: String = "",
-    val nome: String = "",
-    val data: String = "",
-    val descricao: String = "",
-    val classificacao: String = "",
-    val fotoUrl: String = ""
-)

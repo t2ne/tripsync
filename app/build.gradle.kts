@@ -61,4 +61,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    //Para os items
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
 }
