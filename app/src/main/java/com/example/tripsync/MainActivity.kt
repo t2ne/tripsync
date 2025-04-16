@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inicializar Firebase Auth
+        // Iniciar Firebase Auth
         auth = FirebaseAuth.getInstance()
 
         val emailInput = findViewById<EditText>(R.id.emailInput)

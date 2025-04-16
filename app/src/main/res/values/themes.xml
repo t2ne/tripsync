@@ -5,14 +5,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="Theme.Tripsync" parent="Base.Theme.Tripsync" />
-
-    <!-- Tema personalizado para evitar o splash duplicado -->
-    <style name="Theme.Tripsync.NoActionBar" parent="Theme.Tripsync">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
+
 </resources>

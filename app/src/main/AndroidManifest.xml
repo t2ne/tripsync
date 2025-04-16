@@ -14,24 +14,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Tripsync"
+        android:theme="@style/Base.Theme.Tripsync"
         tools:targetApi="31">
 
-        <!-- Tela de introdução (primeira a abrir) -->
+        <!-- Tela de login como principal entry point -->
         <activity
-            android:name=".IntroActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Tripsync.NoActionBar">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Tela de login -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
 
         <!-- Tela de registo -->
         <activity
