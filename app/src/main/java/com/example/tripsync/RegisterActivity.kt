@@ -62,15 +62,28 @@ class RegisterActivity : AppCompatActivity() {
 
             // Mostrar progresso
             val progressDialog = android.app.ProgressDialog(this)
-            progressDialog.setMessage("Registrando usuário...")
+            progressDialog.setMessage("A registar utilizador...")
             progressDialog.show()
 
             // Criar usuário no Firebase Auth
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Registro bem-sucedido, salvar dados adicionais no Firestore
+                        // Registro bem-sucedido, enviar email de verificação
                         val user = auth.currentUser
+
+                        user?.sendEmailVerification()
+                            ?.addOnCompleteListener { verificationTask ->
+                                if (verificationTask.isSuccessful) {
+                                    // Email de verificação enviado com sucesso
+                                    Toast.makeText(
+                                        this,
+                                        "Email de verificação enviado para $email",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+
                         val userId = user?.uid
 
                         if (userId != null) {
@@ -78,7 +91,8 @@ class RegisterActivity : AppCompatActivity() {
                                 "nome" to nome,
                                 "username" to username,
                                 "email" to email,
-                                "fotoPerfilUrl" to ""
+                                "fotoPerfilUrl" to "",
+                                "emailVerificado" to false
                             )
 
                             db.collection("usuarios")
@@ -86,26 +100,28 @@ class RegisterActivity : AppCompatActivity() {
                                 .set(userData)
                                 .addOnSuccessListener {
                                     progressDialog.dismiss()
-                                    Toast.makeText(this, "Registro realizado com sucesso!",
-                                        Toast.LENGTH_SHORT).show()
 
-                                    // Redirecionar para HomeActivity
-                                    val intent = Intent(this, HomeActivity::class.java)
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    val intent = Intent(this, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 }
                                 .addOnFailureListener { e ->
                                     progressDialog.dismiss()
-                                    Toast.makeText(this, "Erro ao salvar dados: ${e.message}",
-                                        Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        this,
+                                        "Erro ao salvar dados: ${e.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                         }
                     } else {
                         // Falha no registro
                         progressDialog.dismiss()
-                        Toast.makeText(this, "Erro no registro: ${task.exception?.message}",
-                            Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Erro no registro: ${task.exception?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
         }
@@ -115,4 +131,5 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
     }
+
 }
