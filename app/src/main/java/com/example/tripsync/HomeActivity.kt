@@ -6,15 +6,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -58,7 +55,7 @@ class HomeActivity : AppCompatActivity() {
 
         // Verificar se o usuário está logado
         if (auth.currentUser == null) {
-            // Redirecionar para login
+            // Redirecionar para tela de login
             startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
@@ -88,25 +85,27 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = ViagemAdapter(viagens) { viagem ->
-            // Clique no item abre a tela de edição
-            val intent = Intent(this@HomeActivity, EditarViagemActivity::class.java)
-            intent.putExtra("nomeViagem", viagem.nome)
+        adapter = ViagemAdapter(viagens, { viagem ->
+            // Abrir tela de edição quando clicar em uma viagem
+            val intent = Intent(this, EditarViagemActivity::class.java)
             intent.putExtra("viagemId", viagem.id)
+            intent.putExtra("nomeViagem", viagem.nome)
             startActivity(intent)
-        }
+        }, { position ->
+            compartilharViagem(position)
+        })
 
         viagensRecyclerView.layoutManager = LinearLayoutManager(this)
         viagensRecyclerView.adapter = adapter
 
         // Configurar o ItemTouchHelper para suportar swipe
-        val itemTouchHelper = ItemTouchHelper(SwipeToDeleteCallback())
+        val itemTouchHelper = ItemTouchHelper(SwipeCallback())
         itemTouchHelper.attachToRecyclerView(viagensRecyclerView)
     }
 
     private fun setupFiltros() {
         btnFiltros.setOnClickListener {
-            val filtroOptions = arrayOf("Crescente", "Descrescente")
+            val filtroOptions = arrayOf("Nome (Z-A)", "Nome (A-Z)", "Data (Mais Antiga)", "Data (Mais Recente)")
             val adapterFiltro = ArrayAdapter(this, android.R.layout.simple_spinner_item, filtroOptions)
             adapterFiltro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerFiltro.adapter = adapterFiltro
@@ -114,10 +113,8 @@ class HomeActivity : AppCompatActivity() {
             // Alterna a visibilidade do spinner
             if (spinnerFiltro.visibility == View.GONE) {
                 spinnerFiltro.visibility = View.VISIBLE
-                btnFiltros.text = "FILTROS v"
             } else {
                 spinnerFiltro.visibility = View.GONE
-                btnFiltros.text = "FILTROS +"
             }
         }
 
@@ -125,8 +122,10 @@ class HomeActivity : AppCompatActivity() {
         spinnerFiltro.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 when (position) {
-                    0 -> sortViagensCrescente()
-                    1 -> sortViagensDecrescente()
+                    0 -> sortViagensByNomeCrescente()
+                    1 -> sortViagensByNomeDecrescente()
+                    2 -> sortViagensByDataAscendente()
+                    3 -> sortViagensByDataDescendente()
                 }
             }
 
@@ -144,72 +143,63 @@ class HomeActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 viagens.clear()
                 for (document in documents) {
-                    val viagemMap = document.data
                     val viagem = Viagem(
                         id = document.id,
-                        nome = viagemMap["nome"] as? String ?: "",
-                        data = viagemMap["data"] as? String ?: "",
-                        descricao = viagemMap["descricao"] as? String ?: "",
-                        classificacao = viagemMap["classificacao"] as? String ?: "",
-                        fotoUrl = viagemMap["fotoUrl"] as? String ?: ""
+                        nome = document.getString("nome") ?: "",
+                        data = document.getString("data") ?: "",
+                        descricao = document.getString("descricao") ?: "",
+                        classificacao = document.getString("classificacao") ?: "",
+                        fotoUrl = document.getString("fotoUrl") ?: ""
                     )
                     viagens.add(viagem)
                 }
                 adapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Erro ao carregar viagens: ${exception.message}",
-                    Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Erro ao carregar viagens: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun sortViagensCrescente() {
+    private fun sortViagensByNomeCrescente() {
         viagens.sortBy { it.nome }
         adapter.notifyDataSetChanged()
     }
 
-    private fun sortViagensDecrescente() {
+    private fun sortViagensByNomeDecrescente() {
         viagens.sortByDescending { it.nome }
         adapter.notifyDataSetChanged()
     }
 
-    private fun removerViagem(position: Int) {
-        val userId = auth.currentUser?.uid ?: return
-        val viagemId = viagens[position].id
-        val viagemRemovida = viagens[position]
+    private fun sortViagensByDataAscendente() {
+        // Separar viagens com data e sem data
+        val viagensComData = viagens.filter { it.data.isNotEmpty() }
+        val viagensSemData = viagens.filter { it.data.isEmpty() }
 
-        // Remover da lista local primeiro para atualização imediata da UI
-        viagens.removeAt(position)
-        adapter.notifyItemRemoved(position)
+        // Ordenar apenas as viagens com data
+        val viagensOrdenadasPorData = viagensComData.sortedBy { it.data }
 
-        // Remover do Firestore
-        db.collection("usuarios")
-            .document(userId)
-            .collection("viagens")
-            .document(viagemId)
-            .delete()
-            .addOnSuccessListener {
-                Snackbar.make(viagensRecyclerView, "Viagem removida com sucesso", Snackbar.LENGTH_LONG)
-                    .setAction("DESFAZER") {
-                        // Restaurar viagem na posição
-                        viagens.add(position, viagemRemovida)
-                        adapter.notifyItemInserted(position)
+        // Limpar a lista atual e adicionar na ordem desejada
+        viagens.clear()
+        viagens.addAll(viagensOrdenadasPorData)
+        viagens.addAll(viagensSemData)
 
-                        // Re-inserir no Firestore
-                        db.collection("usuarios")
-                            .document(userId)
-                            .collection("viagens")
-                            .document(viagemId)
-                            .set(viagemRemovida)
-                    }
-                    .show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao remover viagem: ${e.message}", Toast.LENGTH_SHORT).show()
-                // Restaurar na UI se falhar no Firestore
-                viagens.add(position, viagemRemovida)
-                adapter.notifyItemInserted(position)
-            }
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun sortViagensByDataDescendente() {
+        // Separar viagens com data e sem data
+        val viagensComData = viagens.filter { it.data.isNotEmpty() }
+        val viagensSemData = viagens.filter { it.data.isEmpty() }
+
+        // Ordenar apenas as viagens com data
+        val viagensOrdenadasPorData = viagensComData.sortedByDescending { it.data }
+
+        // Limpar a lista atual e adicionar na ordem desejada
+        viagens.clear()
+        viagens.addAll(viagensOrdenadasPorData)
+        viagens.addAll(viagensSemData)
+
+        adapter.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -220,69 +210,55 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    // Adapter do RecyclerView
-    inner class ViagemAdapter(
-        private val viagens: List<Viagem>,
-        private val onItemClick: (Viagem) -> Unit
-    ) : RecyclerView.Adapter<ViagemAdapter.ViagemViewHolder>() {
+    private fun compartilharViagem(position: Int) {
+        val viagem = viagens[position]
+        val shareText = "Olá! Quero compartilhar esta viagem contigo:\n" +
+                "Nome: ${viagem.nome}\n" +
+                "Data: ${viagem.data}\n" +
+                "Classificação: ${viagem.classificacao}\n" +
+                "Descrição: ${viagem.descricao}\n" +
+                "Partilhado através do TripSync!"
 
-        inner class ViagemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val nomeViagem: TextView = view.findViewById(R.id.nomeViagem)
-            val dataViagem: TextView = view.findViewById(R.id.dataViagem)
-            val container: View = view.findViewById(R.id.itemContainer)
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViagemViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_viagem_swipe, parent, false)
-            return ViagemViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViagemViewHolder, position: Int) {
-            val viagem = viagens[position]
-
-            holder.nomeViagem.text = viagem.nome
-            holder.dataViagem.text = viagem.data
-
-            // Configurar o clique no item para editar
-            holder.container.setOnClickListener {
-                onItemClick(viagem)
-            }
-        }
-
-        override fun getItemCount() = viagens.size
+        startActivity(Intent.createChooser(shareIntent, "Compartilhar via"))
     }
 
-    // Implementação do callback para suportar swipe para excluir
-    inner class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(
-        0, ItemTouchHelper.LEFT
+    inner class SwipeCallback : ItemTouchHelper.SimpleCallback(
+        0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
     ) {
         private val deleteIcon = getDrawable(R.drawable.ic_delete)
-        private val background = ColorDrawable(Color.RED)
+        private val shareIcon = getDrawable(R.drawable.ic_share)
+        private val deleteBackground = ColorDrawable(Color.RED)
+        private val shareBackground = ColorDrawable(Color.rgb(0, 150, 0)) // Verde
 
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            return false // Não suportamos arrastar/reordenar
+            return false
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val position = viewHolder.adapterPosition
 
-            // Confirmar antes de remover
-            AlertDialog.Builder(this@HomeActivity)
-                .setTitle("Remover Viagem")
-                .setMessage("Tem certeza que deseja remover esta viagem?")
-                .setPositiveButton("Sim") { _, _ ->
-                    removerViagem(position)
+            when (direction) {
+                ItemTouchHelper.LEFT -> {
+                    // Excluir viagem
+                    val viagemParaExcluir = viagens[position]
+                    excluirViagem(viagemParaExcluir, position)
                 }
-                .setNegativeButton("Cancelar") { _, _ ->
-                    // Se cancelar, restaurar o item na posição
-                    adapter.notifyItemChanged(position)
+                ItemTouchHelper.RIGHT -> {
+                    // Compartilhar viagem
+                    compartilharViagem(position)
+                    adapter.notifyItemChanged(position) // Restaurar item após compartilhar
                 }
-                .show()
+            }
         }
 
         override fun onChildDraw(
@@ -295,31 +271,114 @@ class HomeActivity : AppCompatActivity() {
             isCurrentlyActive: Boolean
         ) {
             val itemView = viewHolder.itemView
-            val iconMargin = (itemView.height - (deleteIcon?.intrinsicHeight ?: 0)) / 2
+            val itemHeight = itemView.height
 
-            // Desenhar fundo vermelho
-            background.setBounds(
-                itemView.right + dX.toInt(),
-                itemView.top,
-                itemView.right,
-                itemView.bottom
-            )
-            background.draw(c)
+            // Limpar canvas para evitar sobreposição de fundo
+            if (dX == 0f) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                return
+            }
 
-            // Calcular posição do ícone
-            deleteIcon?.let {
-                val iconTop = itemView.top + (itemView.height - it.intrinsicHeight) / 2
-                val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
+            if (dX < 0) { // Deslizando para a esquerda (excluir)
+                // Desenhar fundo vermelho
+                deleteBackground.setBounds(
+                    itemView.right + dX.toInt(),
+                    itemView.top,
+                    itemView.right,
+                    itemView.bottom
+                )
+                deleteBackground.draw(c)
+
+                // Desenhar ícone de lixeira
+                val iconMargin = (itemHeight - (deleteIcon?.intrinsicHeight ?: 0)) / 2
+                val iconTop = itemView.top + iconMargin
+                val iconBottom = iconTop + (deleteIcon?.intrinsicHeight ?: 0)
                 val iconRight = itemView.right - iconMargin
-                val iconBottom = iconTop + it.intrinsicHeight
+                val iconLeft = iconRight - (deleteIcon?.intrinsicWidth ?: 0)
 
-                // Definir limites do ícone
-                it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
-                it.draw(c)
+                deleteIcon?.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                deleteIcon?.draw(c)
+            } else if (dX > 0) { // Deslizando para a direita (compartilhar)
+                // Desenhar fundo verde
+                shareBackground.setBounds(
+                    itemView.left,
+                    itemView.top,
+                    itemView.left + dX.toInt(),
+                    itemView.bottom
+                )
+                shareBackground.draw(c)
+
+                // Desenhar ícone de compartilhamento
+                val iconMargin = (itemHeight - (shareIcon?.intrinsicHeight ?: 0)) / 2
+                val iconTop = itemView.top + iconMargin
+                val iconBottom = iconTop + (shareIcon?.intrinsicHeight ?: 0)
+                val iconLeft = itemView.left + iconMargin
+                val iconRight = iconLeft + (shareIcon?.intrinsicWidth ?: 0)
+
+                shareIcon?.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                shareIcon?.draw(c)
             }
 
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
+    }
+
+    private fun excluirViagem(viagem: Viagem, position: Int) {
+        // Mostrar diálogo de confirmação
+        AlertDialog.Builder(this)
+            .setTitle("Excluir Viagem")
+            .setMessage("Deseja realmente excluir a viagem '${viagem.nome}'?")
+            .setPositiveButton("Sim") { dialog, _ ->
+                val userId = auth.currentUser?.uid ?: return@setPositiveButton
+
+                db.collection("usuarios")
+                    .document(userId)
+                    .collection("viagens")
+                    .document(viagem.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        // Remover da lista e notificar adapter
+                        val removedViagem = viagens.removeAt(position)
+                        adapter.notifyItemRemoved(position)
+
+                        // Mostrar opção de desfazer
+                        Snackbar.make(viagensRecyclerView, "Viagem excluída", Snackbar.LENGTH_LONG)
+                            .setAction("DESFAZER") {
+                                // Restaurar a viagem no Firestore
+                                val viagemData = hashMapOf(
+                                    "nome" to removedViagem.nome,
+                                    "data" to removedViagem.data,
+                                    "descricao" to removedViagem.descricao,
+                                    "classificacao" to removedViagem.classificacao,
+                                    "fotoUrl" to removedViagem.fotoUrl
+                                )
+
+                                db.collection("usuarios")
+                                    .document(userId)
+                                    .collection("viagens")
+                                    .add(viagemData)
+                                    .addOnSuccessListener { documentReference ->
+                                        removedViagem.id = documentReference.id
+                                        viagens.add(position, removedViagem)
+                                        adapter.notifyItemInserted(position)
+                                    }
+                            }
+                            .show()
+                    }
+                    .addOnFailureListener { e ->
+                        // Informar erro e manter item na lista
+                        Toast.makeText(this, "Erro ao excluir: ${e.message}", Toast.LENGTH_SHORT).show()
+                        adapter.notifyItemChanged(position)
+                    }
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Não") { dialog, _ ->
+                // Cancelar exclusão e restaurar item
+                adapter.notifyItemChanged(position)
+                dialog.dismiss()
+            }
+            .show()
     }
 
     companion object {
