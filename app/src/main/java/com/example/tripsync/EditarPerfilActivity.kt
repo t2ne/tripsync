@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -25,6 +26,8 @@ class EditarPerfilActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private var selectedProfileImageUri: Uri? = null
     private var imagePath: String = ""
+    private var hasFotoPerfil = false
+    private var fotoMarcadaParaRemocao = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +71,41 @@ class EditarPerfilActivity : AppCompatActivity() {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
+
+        // Configurar o botão de remover foto de perfil
+        val btnRemoverFotoPerfil = findViewById<Button>(R.id.btnRemoverFotoPerfil)
+        btnRemoverFotoPerfil.setOnClickListener {
+            if (!hasFotoPerfil && !fotoMarcadaParaRemocao) {
+                Toast.makeText(this, "Não há foto de perfil para remover", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val alertDialog = AlertDialog.Builder(this)
+                .setTitle("Remover Foto")
+                .setMessage("Tem a certeza que deseja remover a foto de perfil?")
+                .setPositiveButton("Sim") { dialog, _ ->
+                    // Apenas marca para remoção visual
+                    marcarFotoParaRemocao()
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Não") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+            alertDialog.show()
+        }
+    }
+
+    private fun marcarFotoParaRemocao() {
+        // Apenas alteração visual - a remoção real será feita apenas no salvamento
+        val imgPerfil = findViewById<ImageView>(R.id.imgPerfil)
+        imgPerfil.setImageResource(R.drawable.logo)
+
+        fotoMarcadaParaRemocao = true
+        selectedProfileImageUri = null
+
+        Toast.makeText(this, "Foto será removida ao salvar as alterações", Toast.LENGTH_SHORT).show()
+        Log.d("EditarPerfilActivity", "Foto marcada para remoção")
     }
 
     private fun showLogoutConfirmationDialog() {
@@ -95,28 +133,53 @@ class EditarPerfilActivity : AppCompatActivity() {
     private fun carregarDadosUsuario(etNome: EditText, etUsername: EditText, etEmail: EditText, imgPerfil: ImageView) {
         val userId = auth.currentUser?.uid ?: return
 
-        lifecycleScope.launch {
-            // Buscar o caminho da imagem do perfil do Room
-            val path = ImageUtils.getImagePath(this@EditarPerfilActivity, userId, "profile")
-            if (path != null) {
-                imagePath = path
-                val file = File(path)
-                if (file.exists()) {
-                    imgPerfil.setImageURI(Uri.fromFile(file))
-                }
-            }
-        }
+        // Resetar flags no carregamento
+        fotoMarcadaParaRemocao = false
+        selectedProfileImageUri = null
+        hasFotoPerfil = false
 
+        // Buscar dados do Firestore primeiro
         db.collection("usuarios").document(userId).get()
             .addOnSuccessListener { document ->
-                if (document != null) {
+                if (document != null && document.exists()) {
+                    // Preencher campos de texto
                     etNome.setText(document.getString("nome"))
                     etUsername.setText(document.getString("username"))
                     etEmail.setText(document.getString("email"))
+
+                    // Verificar se existe um caminho de foto no Firestore
+                    val fotoPerfilUrl = document.getString("fotoPerfilUrl") ?: ""
+
+                    // Verificar se existe foto de perfil (caminho não vazio)
+                    if (fotoPerfilUrl.isNotEmpty()) {
+                        lifecycleScope.launch {
+                            val file = File(fotoPerfilUrl)
+                            if (file.exists()) {
+                                imgPerfil.setImageURI(Uri.fromFile(file))
+                                imagePath = fotoPerfilUrl
+                                hasFotoPerfil = true
+                                Log.d("EditarPerfilActivity", "Foto de perfil carregada: $fotoPerfilUrl")
+                            } else {
+                                imgPerfil.setImageResource(R.drawable.logo)
+                                Log.d("EditarPerfilActivity", "Arquivo de foto não existe: $fotoPerfilUrl")
+                                hasFotoPerfil = false
+                            }
+                        }
+                    } else {
+                        // Sem foto, usar logo padrão
+                        imgPerfil.setImageResource(R.drawable.logo)
+                        hasFotoPerfil = false
+                        Log.d("EditarPerfilActivity", "Usuário sem foto de perfil")
+                    }
+                } else {
+                    Log.d("EditarPerfilActivity", "Documento não existe no Firestore")
+                    imgPerfil.setImageResource(R.drawable.logo)
                 }
             }
             .addOnFailureListener { e ->
+                Log.e("EditarPerfilActivity", "Erro ao carregar dados: ${e.message}")
                 Toast.makeText(this, "Erro ao carregar dados: ${e.message}", Toast.LENGTH_SHORT).show()
+                imgPerfil.setImageResource(R.drawable.logo)
             }
     }
 
@@ -149,35 +212,67 @@ class EditarPerfilActivity : AppCompatActivity() {
         if (password.isNotEmpty()) {
             user.updatePassword(password)
                 .addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Toast.makeText(this, "Erro ao atualizar senha: ${task.exception?.message}",
-                            Toast.LENGTH_SHORT).show()
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, "Senha atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Erro ao atualizar senha: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
 
-        // Atualizar dados no Firestore
-        val userData = hashMapOf(
-            "nome" to nome,
-            "username" to username,
-            "email" to email
-        )
-
+        // Atualizar dados no Firestore e gerenciar imagem
         lifecycleScope.launch {
-            // Se uma nova imagem foi selecionada
-            if (selectedProfileImageUri != null) {
+            // Criar um mapa com os dados a serem atualizados
+            val userData = hashMapOf(
+                "nome" to nome,
+                "username" to username,
+                "email" to email
+            )
+
+            // Processar alterações de imagem
+            if (fotoMarcadaParaRemocao) {
+                // Remover a foto se foi marcada para remoção
+                if (imagePath.isNotEmpty()) {
+                    try {
+                        ImageUtils.deleteImage(this@EditarPerfilActivity, userId, "profile")
+                        userData["fotoPerfilUrl"] = ""
+                        hasFotoPerfil = false
+                        imagePath = ""
+                        Log.d("EditarPerfilActivity", "Foto removida com sucesso durante o salvamento")
+                    } catch (e: Exception) {
+                        Log.e("EditarPerfilActivity", "Erro ao remover imagem: ${e.message}")
+                    }
+                }
+            } else if (selectedProfileImageUri != null) {
+                // Se uma nova imagem foi selecionada
+                Log.d("EditarPerfilActivity", "Nova imagem selecionada, salvando...")
+
                 // Deletar imagem antiga se existir
                 if (imagePath.isNotEmpty()) {
-                    ImageUtils.deleteImage(this@EditarPerfilActivity, userId, "profile")
+                    try {
+                        ImageUtils.deleteImage(this@EditarPerfilActivity, userId, "profile")
+                    } catch (e: Exception) {
+                        Log.e("EditarPerfilActivity", "Erro ao deletar imagem antiga: ${e.message}")
+                    }
                 }
 
                 // Salvar nova imagem
-                imagePath = ImageUtils.saveImageToInternalStorage(
-                    this@EditarPerfilActivity,
-                    selectedProfileImageUri!!,
-                    userId,
-                    "profile"
-                )
+                try {
+                    imagePath = ImageUtils.saveImageToInternalStorage(
+                        this@EditarPerfilActivity,
+                        selectedProfileImageUri!!,
+                        userId,
+                        "profile"
+                    )
+
+                    // Atualizar o caminho da imagem no Firestore
+                    userData["fotoPerfilUrl"] = imagePath
+                    hasFotoPerfil = true
+                    Log.d("EditarPerfilActivity", "Nova imagem salva em: $imagePath")
+                } catch (e: Exception) {
+                    Log.e("EditarPerfilActivity", "Erro ao salvar nova imagem: ${e.message}")
+                    Toast.makeText(this@EditarPerfilActivity, "Erro ao salvar imagem: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
 
             // Atualizar no Firestore
@@ -205,6 +300,12 @@ class EditarPerfilActivity : AppCompatActivity() {
             selectedProfileImageUri = data.data
             val imageView = findViewById<ImageView>(R.id.imgPerfil)
             imageView.setImageURI(selectedProfileImageUri)
+
+            // Resetar flag de remoção se selecionar nova imagem
+            fotoMarcadaParaRemocao = false
+
+            // Marcar que tem foto de perfil quando seleciona
+            hasFotoPerfil = true
         }
     }
 

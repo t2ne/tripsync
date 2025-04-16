@@ -39,14 +39,27 @@
             android:scaleType="centerCrop"
             android:layout_gravity="center"/>
 
-        <!-- Botão para selecionar a foto -->
-        <Button
-            android:id="@+id/btnSelecionarFotoPerfil"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecionar Foto de Perfil"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnSelecionarFotoPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecionar Foto"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnRemoverFotoPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remover Foto"
+                android:backgroundTint="@color/colorAccent" />
+        </LinearLayout>
 
         <!-- Campos de exemplo -->
         <EditText
