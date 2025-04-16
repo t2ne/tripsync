@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             val email = emailInput.text.toString()
             if (email.isEmpty()) {
                 Toast.makeText(
-                    this, "Insira seu email para recuperar a senha",
+                    this, "Insira o seu email para recuperar a senha",
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
