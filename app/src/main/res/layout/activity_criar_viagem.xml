@@ -1,75 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="#FFFFFF">
 
-    <!-- Botão voltar -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="start|top"
-        android:contentDescription="Voltar"
-        android:src="@drawable/back" />
-
-    <!-- Título -->
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Criar Viagem"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
-
-    <!-- Campos -->
-    <EditText
-        android:id="@+id/etNome"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome da Viagem*"
-        android:layout_below="@id/titleText"
-        android:layout_marginTop="32dp"
-        android:background="@android:drawable/edit_text" />
+        android:padding="16dp">
 
-    <EditText
-        android:id="@+id/etData"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Data"
-        android:layout_below="@id/etNome"
-        android:layout_marginTop="16dp"
-        android:background="@android:drawable/edit_text" />
+        <!-- Botão voltar -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="Voltar"
+            android:src="@drawable/back" />
 
-    <EditText
-        android:id="@+id/etDescricao"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Descrição"
-        android:layout_below="@id/etData"
-        android:layout_marginTop="16dp"
-        android:background="@android:drawable/edit_text" />
+        <!-- Título -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Criar Viagem"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp" />
 
-    <EditText
-        android:id="@+id/etClassificacao"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Classificação"
-        android:layout_below="@id/etDescricao"
-        android:layout_marginTop="16dp"
-        android:background="@android:drawable/edit_text" />
+        <!-- Campos -->
+        <EditText
+            android:id="@+id/etNome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome da Viagem*"
+            android:layout_below="@id/titleText"
+            android:layout_marginTop="32dp"
+            android:background="@android:drawable/edit_text" />
 
-    <!-- Botão CRIAR -->
-    <Button
-        android:id="@+id/btnCriarViagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CRIAR +"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/etClassificacao"
-        android:layout_marginTop="32dp" />
-</RelativeLayout>
+        <EditText
+            android:id="@+id/etData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Data"
+            android:layout_below="@id/etNome"
+            android:layout_marginTop="16dp"
+            android:background="@android:drawable/edit_text" />
+
+        <EditText
+            android:id="@+id/etDescricao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descrição"
+            android:layout_below="@id/etData"
+            android:layout_marginTop="16dp"
+            android:background="@android:drawable/edit_text" />
+
+        <EditText
+            android:id="@+id/etClassificacao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Classificação"
+            android:layout_below="@id/etDescricao"
+            android:layout_marginTop="16dp"
+            android:background="@android:drawable/edit_text" />
+
+        <!-- Título da seção de locais -->
+        <TextView
+            android:id="@+id/tvLocaisTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Locais Visitados"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_below="@id/etClassificacao"
+            android:layout_marginTop="24dp" />
+
+        <!-- Container para locais dinâmicos -->
+        <LinearLayout
+            android:id="@+id/containerLocais"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/tvLocaisTitulo"
+            android:layout_marginTop="8dp" />
+
+        <LinearLayout
+            android:id="@+id/containerBtnAdicionarLocal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/containerLocais"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvAdicionarRemoverLocal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adicionar/Remover Local"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"/>
+
+            <ImageView
+                android:id="@+id/btnAdicionarLocal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_input_add"
+                android:contentDescription="Adicionar Local" />
+
+            <ImageView
+                android:id="@+id/btnRemoverUltimoLocal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_delete"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Remover Último Local" />
+        </LinearLayout>
+
+        <!-- Botão CRIAR -->
+        <Button
+            android:id="@+id/btnCriarViagem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CRIAR +"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/containerBtnAdicionarLocal"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp" />
+    </RelativeLayout>
+</ScrollView>

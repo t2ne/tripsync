@@ -6,9 +6,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +30,13 @@ class EditarViagemActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private var imagePath: String = ""
 
+    // Componentes dos locais
+    private lateinit var containerLocais: LinearLayout
+    private lateinit var btnAdicionarLocal: ImageView
+    private lateinit var btnRemoverUltimoLocal: ImageView
+    private lateinit var tvAdicionarRemoverLocal: TextView
+    private val locaisViagem = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_viagem)
@@ -37,6 +48,33 @@ class EditarViagemActivity : AppCompatActivity() {
         // Recebe dados
         val nome = intent.getStringExtra("nomeViagem") ?: ""
         viagemId = intent.getStringExtra("viagemId") ?: ""
+
+        // Inicializar componentes dos locais
+        containerLocais = findViewById(R.id.containerLocais)
+        btnAdicionarLocal = findViewById(R.id.btnAdicionarLocal)
+        btnRemoverUltimoLocal = findViewById(R.id.btnRemoverUltimoLocal)
+        tvAdicionarRemoverLocal = findViewById(R.id.tvAdicionarRemoverLocal)
+
+        // Configurar botão de adicionar local
+        btnAdicionarLocal.setOnClickListener {
+            if (containerLocais.childCount < MAX_LOCAIS) {
+                adicionarNovoLocal()
+
+                // Ocultar apenas o botão + quando atingir o limite
+                if (containerLocais.childCount >= MAX_LOCAIS) {
+                    btnAdicionarLocal.visibility = View.GONE
+                }
+            }
+        }
+
+        // Configurar botão de remover último local
+        btnRemoverUltimoLocal.setOnClickListener {
+            if (containerLocais.childCount > 1) {
+                removerUltimoLocal()
+            } else {
+                Toast.makeText(this, "É necessário pelo menos um local!", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         // Carregar dados da viagem do Firestore
         carregarDadosViagem()
@@ -87,11 +125,82 @@ class EditarViagemActivity : AppCompatActivity() {
                             imgFotoViagem.setImageURI(Uri.fromFile(file))
                         }
                     }
+
+                    // Carregar locais se existirem
+                    val locais = document.get("locais") as? List<String>
+                    if (!locais.isNullOrEmpty()) {
+                        carregarLocaisExistentes(locais)
+                    } else {
+                        // Se não houver locais, adicionar pelo menos um vazio
+                        adicionarNovoLocal()
+                    }
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Erro ao carregar dados: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun carregarLocaisExistentes(locais: List<String>) {
+        // Limpar container de locais
+        containerLocais.removeAllViews()
+
+        // Adicionar cada local
+        for (local in locais) {
+            val localView = LayoutInflater.from(this).inflate(R.layout.item_local, containerLocais, false)
+
+            val indice = containerLocais.childCount + 1
+            val tvLocalLabel = localView.findViewById<TextView>(R.id.tvLocalLabel)
+            tvLocalLabel.text = "Local $indice"
+
+            val etLocal = localView.findViewById<EditText>(R.id.etLocal)
+            etLocal.setText(local)
+
+            containerLocais.addView(localView)
+        }
+
+        // Atualizar visibilidade do botão de adicionar
+        if (containerLocais.childCount >= MAX_LOCAIS) {
+            btnAdicionarLocal.visibility = View.GONE
+        } else {
+            btnAdicionarLocal.visibility = View.VISIBLE
+        }
+    }
+
+    private fun adicionarNovoLocal() {
+        val inflater = LayoutInflater.from(this)
+        val localView = inflater.inflate(R.layout.item_local, containerLocais, false)
+
+        val indice = containerLocais.childCount + 1
+        val tvLocalLabel = localView.findViewById<TextView>(R.id.tvLocalLabel)
+        tvLocalLabel.text = "Local $indice"
+
+        containerLocais.addView(localView)
+    }
+
+    private fun removerUltimoLocal() {
+        if (containerLocais.childCount > 0) {
+            containerLocais.removeViewAt(containerLocais.childCount - 1)
+
+            // Mostrar botão de adicionar se estiver abaixo do limite
+            if (containerLocais.childCount < MAX_LOCAIS) {
+                btnAdicionarLocal.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun getLocais() {
+        locaisViagem.clear()
+
+        for (i in 0 until containerLocais.childCount) {
+            val localView = containerLocais.getChildAt(i)
+            val etLocal = localView.findViewById<EditText>(R.id.etLocal)
+            val localText = etLocal.text.toString().trim()
+
+            if (localText.isNotEmpty()) {
+                locaisViagem.add(localText)
+            }
+        }
     }
 
     private fun salvarAlteracoes() {
@@ -105,6 +214,9 @@ class EditarViagemActivity : AppCompatActivity() {
             findViewById<EditText>(R.id.edtNomeViagem).error = "Nome é obrigatório"
             return
         }
+
+        // Coletar locais preenchidos
+        getLocais()
 
         // Mostrar progresso
         val progressDialog = ProgressDialog(this)
@@ -133,15 +245,17 @@ class EditarViagemActivity : AppCompatActivity() {
         }
     }
 
-    private fun atualizarViagem(userId: String, nome: String, data: String, descricao: String,
-                                classificacao: String, fotoUrl: String) {
-
+    private fun atualizarViagem(
+        userId: String, nome: String, data: String, descricao: String,
+        classificacao: String, fotoUrl: String
+    ) {
         val viagemAtualizada = hashMapOf(
             "nome" to nome,
             "data" to data,
             "descricao" to descricao,
             "classificacao" to classificacao,
-            "fotoUrl" to fotoUrl
+            "fotoUrl" to fotoUrl,
+            "locais" to locaisViagem
         )
 
         db.collection("usuarios")
@@ -157,8 +271,10 @@ class EditarViagemActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao atualizar viagem: ${e.message}",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this, "Erro ao atualizar viagem: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -175,5 +291,6 @@ class EditarViagemActivity : AppCompatActivity() {
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1
+        private const val MAX_LOCAIS = 10
     }
 }

@@ -101,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingBottom="32dp">
+            android:paddingBottom="16dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -118,13 +118,65 @@
                 android:inputType="numberDecimal" />
         </LinearLayout>
 
+        <!-- Início da seção de Locais -->
+        <!-- Título da seção de locais -->
+        <TextView
+            android:id="@+id/tvLocaisTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Locais Visitados"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <!-- Container para locais dinâmicos -->
+        <LinearLayout
+            android:id="@+id/containerLocais"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <LinearLayout
+            android:id="@+id/containerBtnAdicionarLocal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvAdicionarRemoverLocal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adicionar/Remover Local"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"/>
+
+            <ImageView
+                android:id="@+id/btnAdicionarLocal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_input_add"
+                android:contentDescription="Adicionar Local" />
+
+            <ImageView
+                android:id="@+id/btnRemoverUltimoLocal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_delete"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Remover Último Local" />
+        </LinearLayout>
+        <!-- Fim da seção de Locais -->
+
         <!-- Adicionando ImageView para a foto -->
         <TextView
             android:text="Foto da Viagem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="24dp" />
 
         <ImageView
             android:id="@+id/imgFotoViagem"
@@ -147,6 +199,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Salvar"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
     </LinearLayout>
 </ScrollView>
