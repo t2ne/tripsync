@@ -1,10 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="SelectedPhotoAccess">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:ignore="SelectedPhotoAccess" />
 
     <application
         android:allowBackup="true"
@@ -16,35 +20,33 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Tripsync"
         tools:targetApi="31">
-
-        <!-- Tela de login como principal entry point -->
+        <activity
+            android:name=".FotosViagemActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Tela de registo -->
+        </activity> <!-- Tela de registo -->
         <activity
             android:name=".RegisterActivity"
-            android:exported="true" />
-
-        <!-- Tela Home -->
+            android:exported="true" /> <!-- Tela Home -->
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-
-        <activity android:name=".EditarPerfilActivity"
-            android:exported="false"/>
-
-        <activity android:name=".CriarViagemActivity"
-            android:exported="false"/>
-
-        <activity android:name=".EditarViagemActivity"
-            android:exported="false"/>
+        <activity
+            android:name=".EditarPerfilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CriarViagemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditarViagemActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -55,6 +57,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
+
 </manifest>

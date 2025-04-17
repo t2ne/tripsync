@@ -1,11 +1,8 @@
 package com.example.tripsync
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -16,15 +13,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.tripsync.utils.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
-import java.io.File
 
 class EditarViagemActivity : AppCompatActivity() {
 
-    private var selectedImageUri: Uri? = null
     private lateinit var viagemId: String
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -91,11 +85,15 @@ class EditarViagemActivity : AppCompatActivity() {
             salvarAlteracoes()
         }
 
-        // Configuração do botão de selecionar foto
-        val btnSelecionarFoto = findViewById<Button>(R.id.btnSelecionarFoto)
-        btnSelecionarFoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        // Configuração do botão para acessar o álbum de fotos
+        val btnAcessarFotos = findViewById<LinearLayout>(R.id.btnAcessarFotos)
+        btnAcessarFotos.setOnClickListener {
+            // Abrir a atividade de fotos
+            val intent = Intent(this, FotosViagemActivity::class.java).apply {
+                putExtra("viagemId", viagemId)
+                putExtra("nomeViagem", findViewById<EditText>(R.id.edtNomeViagem).text.toString())
+            }
+            startActivity(intent)
         }
     }
 
@@ -117,27 +115,46 @@ class EditarViagemActivity : AppCompatActivity() {
                     // Guardar o caminho da imagem
                     imagePath = document.getString("fotoUrl") ?: ""
 
-                    // Mostrar a imagem se existir
-                    if (imagePath.isNotEmpty()) {
-                        val file = File(imagePath)
-                        if (file.exists()) {
-                            val imgFotoViagem = findViewById<ImageView>(R.id.imgFotoViagem)
-                            imgFotoViagem.setImageURI(Uri.fromFile(file))
-                        }
-                    }
+                    // Atualizar contador de fotos (opcional)
+                    atualizarContadorFotos()
 
                     // Carregar locais se existirem
                     val locais = document.get("locais") as? List<String>
                     if (!locais.isNullOrEmpty()) {
                         carregarLocaisExistentes(locais)
                     } else {
-                        // Se não houver locais, adicionar pelo menos um vazio
+                        // Adicionar pelo menos um local vazio
                         adicionarNovoLocal()
                     }
                 }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Erro ao carregar dados: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Método para atualizar o contador de fotos
+    private fun atualizarContadorFotos() {
+        val userId = auth.currentUser?.uid ?: return
+        val tvQuantidadeFotos = findViewById<TextView>(R.id.tvQuantidadeFotos)
+
+        db.collection("usuarios")
+            .document(userId)
+            .collection("viagens")
+            .document(viagemId)
+            .collection("fotos")
+            .whereEqualTo("isDeleted", false)
+            .get()
+            .addOnSuccessListener { documents ->
+                val numFotos = documents.size()
+                tvQuantidadeFotos.text = when {
+                    numFotos == 0 -> "Carregue para acessar fotos"
+                    numFotos == 1 -> "1 foto"
+                    else -> "$numFotos fotos"
+                }
+            }
+            .addOnFailureListener {
+                tvQuantidadeFotos.text = "Carregue para acessar fotos"
             }
     }
 
@@ -148,12 +165,11 @@ class EditarViagemActivity : AppCompatActivity() {
         // Adicionar cada local
         for (local in locais) {
             val localView = LayoutInflater.from(this).inflate(R.layout.item_local, containerLocais, false)
-
             val indice = containerLocais.childCount + 1
             val tvLocalLabel = localView.findViewById<TextView>(R.id.tvLocalLabel)
-            tvLocalLabel.text = "Local $indice"
-
             val etLocal = localView.findViewById<EditText>(R.id.etLocal)
+
+            tvLocalLabel.text = "Local $indice"
             etLocal.setText(local)
 
             containerLocais.addView(localView)
@@ -211,7 +227,7 @@ class EditarViagemActivity : AppCompatActivity() {
         val novaClassificacao = findViewById<EditText>(R.id.edtClassificacao).text.toString()
 
         if (novoNome.isBlank()) {
-            findViewById<EditText>(R.id.edtNomeViagem).error = "Nome é obrigatório"
+            Toast.makeText(this, "O nome da viagem é obrigatório", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -224,73 +240,44 @@ class EditarViagemActivity : AppCompatActivity() {
         progressDialog.show()
 
         lifecycleScope.launch {
-            // Se tiver uma nova imagem selecionada
-            if (selectedImageUri != null) {
-                // Deletar imagem antiga se existir
-                if (imagePath.isNotEmpty()) {
-                    ImageUtils.deleteImage(this@EditarViagemActivity, viagemId, "trip")
-                }
+            // Criar objeto com os dados atualizados
+            val viagemAtualizada = hashMapOf(
+                "nome" to novoNome,
+                "data" to novaData,
+                "descricao" to novaDescricao,
+                "classificacao" to novaClassificacao,
+                "fotoUrl" to imagePath,
+                "locais" to locaisViagem
+            )
 
-                // Salvar nova imagem
-                imagePath = ImageUtils.saveImageToInternalStorage(
-                    this@EditarViagemActivity,
-                    selectedImageUri!!,
-                    viagemId,
-                    "trip"
-                )
-            }
-
-            atualizarViagem(userId, novoNome, novaData, novaDescricao, novaClassificacao, imagePath)
-            progressDialog.dismiss()
+            // Atualizar no Firestore
+            atualizarViagem(userId, viagemAtualizada, progressDialog)
         }
     }
 
     private fun atualizarViagem(
-        userId: String, nome: String, data: String, descricao: String,
-        classificacao: String, fotoUrl: String
+        userId: String,
+        viagemAtualizada: HashMap<String, Any>,
+        progressDialog: ProgressDialog
     ) {
-        val viagemAtualizada = hashMapOf(
-            "nome" to nome,
-            "data" to data,
-            "descricao" to descricao,
-            "classificacao" to classificacao,
-            "fotoUrl" to fotoUrl,
-            "locais" to locaisViagem
-        )
-
         db.collection("usuarios")
             .document(userId)
             .collection("viagens")
             .document(viagemId)
-            .update(viagemAtualizada as Map<String, Any>)
+            .update(viagemAtualizada)
             .addOnSuccessListener {
+                progressDialog.dismiss()
                 Toast.makeText(this, "Viagem atualizada com sucesso!", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, HomeActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+                setResult(RESULT_OK)
                 finish()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(
-                    this, "Erro ao atualizar viagem: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                progressDialog.dismiss()
+                Toast.makeText(this, "Erro ao atualizar viagem: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Recebendo a imagem selecionada da galeria
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST) {
-            selectedImageUri = data?.data
-            val imageView = findViewById<ImageView>(R.id.imgFotoViagem)
-            imageView.setImageURI(selectedImageUri)
-        }
-    }
-
     companion object {
-        private const val PICK_IMAGE_REQUEST = 1
         private const val MAX_LOCAIS = 10
     }
 }

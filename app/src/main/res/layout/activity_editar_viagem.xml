@@ -170,36 +170,58 @@
         </LinearLayout>
         <!-- Fim da seção de Locais -->
 
-        <!-- Adicionando ImageView para a foto -->
+        <!-- Seção de Fotos -->
         <TextView
-            android:text="Foto da Viagem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:text="Fotos da Viagem"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="24dp" />
 
-        <ImageView
-            android:id="@+id/imgFotoViagem"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_menu_camera"
-            android:scaleType="centerCrop" />
-
-        <!-- Botão para selecionar a foto -->
-        <Button
-            android:id="@+id/btnSelecionarFoto"
+        <!-- Botão para acessar o álbum de fotos -->
+        <LinearLayout
+            android:id="@+id/btnAcessarFotos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selecionar Foto"
-            android:layout_marginTop="16dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:background="#EEEEEE"
+            android:clickable="true"
+            android:focusable="true">
 
+            <!-- Preview de fotos (até 3) -->
+            <LinearLayout
+                android:id="@+id/containerPreviewFotos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvQuantidadeFotos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Carregue para acessar fotos"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Botão Salvar -->
         <Button
             android:id="@+id/btnCriar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Salvar"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp" />
     </LinearLayout>
 </ScrollView>
