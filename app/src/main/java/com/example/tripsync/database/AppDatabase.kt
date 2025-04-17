@@ -1,4 +1,4 @@
-// app/src/main/java/com/example/tripsync/database/AppDatabase.kt
+// app/src/main/java/com/example/tripsync/database/AppDatabase.kt qck
 package com.example.tripsync.database
 
 import android.content.Context

@@ -29,7 +29,7 @@ class CriarViagemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_criar_viagem)
 
-        // Inicializar Firebase
+        // init firebase
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -40,73 +40,73 @@ class CriarViagemActivity : AppCompatActivity() {
         val descricaoInput = findViewById<EditText>(R.id.etDescricao)
         val classificacaoInput = findViewById<EditText>(R.id.etClassificacao)
 
-        // Inicializar container de locais e botões adicionar/remover
+        // iniciar containers e etc
         containerLocais = findViewById(R.id.containerLocais)
         btnAdicionarLocal = findViewById(R.id.btnAdicionarLocal)
         btnRemoverUltimoLocal = findViewById(R.id.btnRemoverUltimoLocal)
         tvAdicionarRemoverLocal = findViewById(R.id.tvAdicionarRemoverLocal)
 
-        // Adicionar primeiro local por padrão
+        // add local inicial
         adicionarNovoLocal()
 
-        // Configurar botão de adicionar local
+        // config do botão de adicionar local
         btnAdicionarLocal.setOnClickListener {
             if (containerLocais.childCount < MAX_LOCAIS) {
                 adicionarNovoLocal()
 
-                // Ocultar apenas o botão + quando atingir o limite
+                // esconder o botão se tiverem 10 locais
                 if (containerLocais.childCount >= MAX_LOCAIS) {
                     btnAdicionarLocal.visibility = View.GONE
                 }
             }
         }
 
-        // Configurar botão de remover último local
+        //  config do botão de remover locais, se for o último local não pode
         btnRemoverUltimoLocal.setOnClickListener {
             if (containerLocais.childCount > 1) {
                 removerUltimoLocal()
             } else {
-                Toast.makeText(this, "É necessário pelo menos um local!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.necessario_pelo_menos_1_local), Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Botão voltar
+        // back
         backButton.setOnClickListener {
             finish()
         }
 
-        // Botão criar viagem
+        // btn para criar viagem (salvar)
         btnCriarViagem.setOnClickListener {
             val nomeViagem = nomeViagemInput.text.toString().trim()
             val data = dataInput.text.toString().trim()
             val descricao = descricaoInput.text.toString().trim()
             val classificacao = classificacaoInput.text.toString().trim()
 
-            // Validação básica
+            // validação ez
             if (nomeViagem.isEmpty()) {
-                nomeViagemInput.error = "Nome da viagem é obrigatório"
+                nomeViagemInput.error = getString(R.string.nome_da_viagem_obrigatorio)
                 return@setOnClickListener
             }
 
-            // Coletar locais preenchidos
             getLocais()
 
-            // Mostrar progresso
+            // mostrar progresso ao user
             val progressDialog = ProgressDialog(this)
-            progressDialog.setMessage("Criando viagem...")
+            progressDialog.setMessage(getString(R.string.a_criar_viagem))
             progressDialog.show()
 
-            // Criar objeto da viagem
+            // add obj viagem
             val viagem = hashMapOf(
                 "nome" to nomeViagem,
                 "data" to data,
                 "descricao" to descricao,
                 "classificacao" to classificacao,
-                "fotoUrl" to "", // Campo vazio para manter compatibilidade
-                "locais" to locaisViagem // Nova lista de locais
+                "fotoUrl" to "", //vazio por default
+                "locais" to locaisViagem //usado depois no edit
             )
 
-            // Salvar no Firestore
+            // save para a firestore
             val userId = auth.currentUser?.uid
             if (userId != null) {
                 db.collection("usuarios")
@@ -115,18 +115,22 @@ class CriarViagemActivity : AppCompatActivity() {
                     .add(viagem)
                     .addOnSuccessListener { documentReference ->
                         progressDialog.dismiss()
-                        Toast.makeText(this, "Viagem criada com sucesso!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,
+                            getString(R.string.viagem_criada_com_sucesso), Toast.LENGTH_SHORT).show()
                         setResult(RESULT_OK)
                         finish()
                     }
                     .addOnFailureListener { e ->
                         progressDialog.dismiss()
-                        Toast.makeText(this, "Erro ao criar viagem: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,
+                            getString(R.string.erro_ao_criar_viagem) + " ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             } else {
                 progressDialog.dismiss()
-                Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show()
-                // Redirecionar para login
+                Toast.makeText(this,
+                    getString(R.string.utilizador_nao_autenticado), Toast.LENGTH_SHORT).show()
+
+                // redirect para login
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
@@ -148,13 +152,14 @@ class CriarViagemActivity : AppCompatActivity() {
         if (containerLocais.childCount > 0) {
             containerLocais.removeViewAt(containerLocais.childCount - 1)
 
-            // Mostrar botão de adicionar se estiver abaixo do limite
+            // moostrar o botão de adicionar se houver menos de 10 locais
             if (containerLocais.childCount < MAX_LOCAIS) {
                 btnAdicionarLocal.visibility = View.VISIBLE
             }
         }
     }
 
+    //ir buscar os locais
     private fun getLocais() {
         locaisViagem.clear()
 

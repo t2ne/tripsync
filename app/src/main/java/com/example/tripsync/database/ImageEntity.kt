@@ -9,6 +9,6 @@ data class ImageEntity(
     @PrimaryKey
     val id: String,
     val imagePath: String,
-    val type: String, // "profile" ou "trip"
+    val type: String,
     val createdAt: Long = System.currentTimeMillis()
 )

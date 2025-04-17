@@ -19,7 +19,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // Inicializar Firebase Auth e Firestore
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -36,49 +35,48 @@ class RegisterActivity : AppCompatActivity() {
             val nome = nomeInput.text.toString().trim()
             val username = usernameInput.text.toString().trim()
 
-            // Validações
+            // validationes
             when {
                 email.isEmpty() -> {
-                    emailInput.error = "Informe o email"
+                    emailInput.error = getString(R.string.informe_o_email)
                     return@setOnClickListener
                 }
                 password.isEmpty() -> {
-                    passwordInput.error = "Informe a senha"
+                    passwordInput.error = getString(R.string.informe_a_password)
                     return@setOnClickListener
                 }
                 password.length < 6 -> {
-                    passwordInput.error = "A senha deve ter pelo menos 6 caracteres"
+                    passwordInput.error = getString(R.string.password_6_chars_min)
                     return@setOnClickListener
                 }
                 nome.isEmpty() -> {
-                    nomeInput.error = "Informe seu nome"
+                    nomeInput.error = getString(R.string.informe_o_seu_nome)
                     return@setOnClickListener
                 }
                 username.isEmpty() -> {
-                    usernameInput.error = "Informe seu username"
+                    usernameInput.error = getString(R.string.informe_o_seu_username)
                     return@setOnClickListener
                 }
             }
 
-            // Mostrar progresso
+            // progress dialog, usado para mostrar que o registo está a ser processado
             val progressDialog = android.app.ProgressDialog(this)
-            progressDialog.setMessage("A registar utilizador...")
+            progressDialog.setMessage(getString(R.string.a_registar_utilizador))
             progressDialog.show()
 
-            // Criar usuário no Firebase Auth
+            // create
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Registro bem-sucedido, enviar email de verificação
+                        // enviatings of the verificationes amaricans
                         val user = auth.currentUser
 
                         user?.sendEmailVerification()
                             ?.addOnCompleteListener { verificationTask ->
                                 if (verificationTask.isSuccessful) {
-                                    // Email de verificação enviado com sucesso
                                     Toast.makeText(
                                         this,
-                                        "Email de verificação enviado para $email",
+                                        getString(R.string.email_de_verificacao_enviado_para) + " $email",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -86,6 +84,7 @@ class RegisterActivity : AppCompatActivity() {
 
                         val userId = user?.uid
 
+                        // hashmap para segurança do user
                         if (userId != null) {
                             val userData = hashMapOf(
                                 "nome" to nome,
@@ -95,6 +94,7 @@ class RegisterActivity : AppCompatActivity() {
                                 "emailVerificado" to false
                             )
 
+                            // e depois salvar os dados do user no firestore
                             db.collection("usuarios")
                                 .document(userId)
                                 .set(userData)
@@ -109,27 +109,26 @@ class RegisterActivity : AppCompatActivity() {
                                     progressDialog.dismiss()
                                     Toast.makeText(
                                         this,
-                                        "Erro ao salvar dados: ${e.message}",
+                                        getString(R.string.erro_ao_salvar_dados) + " ${e.message}",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
                         }
                     } else {
-                        // Falha no registro
+                        // caso falhar for some reason
                         progressDialog.dismiss()
                         Toast.makeText(
                             this,
-                            "Erro no registro: ${task.exception?.message}",
+                            getString(R.string.erro_ao_registar) + " ${task.exception?.message}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
         }
 
-        // Botão voltar
+        // back button
         backButton.setOnClickListener {
             finish()
         }
     }
-
 }

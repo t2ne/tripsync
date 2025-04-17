@@ -45,6 +45,6 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_share"
-            android:contentDescription="Compartilhar viagem" />
+            android:contentDescription="@string/compartilhar_viagem" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

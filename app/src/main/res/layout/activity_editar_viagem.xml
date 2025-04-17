@@ -10,25 +10,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Botão Voltar -->
         <ImageView
             android:id="@+id/btnVoltar"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/back" />
 
-        <!-- Título -->
         <TextView
             android:id="@+id/txtTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Editar Viagem"
+            android:text="@string/editar_viagem"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:layout_gravity="center_horizontal" />
 
-        <!-- Campo Nome da Viagem -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,18 +38,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nome da Viagem*" />
+                android:text="@string/nome_da_viagem_asterix" />
 
             <EditText
                 android:id="@+id/edtNomeViagem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Digite o nome da viagem"
+                android:hint="@string/digite_o_nome_da_viagem"
                 android:inputType="text" />
         </LinearLayout>
 
-        <!-- Campo Data -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,18 +59,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Data" />
+                android:text="@string/data" />
 
             <EditText
                 android:id="@+id/edtData"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Digite a data"
+                android:hint="@string/digite_a_data"
                 android:inputType="date" />
         </LinearLayout>
 
-        <!-- Campo Descrição -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,18 +80,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Descrição" />
+                android:text="@string/descricao" />
 
             <EditText
                 android:id="@+id/edtDescricao"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Digite a descrição"
+                android:hint="@string/digite_a_descricao"
                 android:inputType="text" />
         </LinearLayout>
 
-        <!-- Campo Classificação -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -107,29 +101,26 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Classificação" />
+                android:text="@string/classificacao" />
 
             <EditText
                 android:id="@+id/edtClassificacao"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Digite a classificação"
+                android:hint="@string/digite_a_classificacao"
                 android:inputType="numberDecimal" />
         </LinearLayout>
 
-        <!-- Início da seção de Locais -->
-        <!-- Título da seção de locais -->
         <TextView
             android:id="@+id/tvLocaisTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Locais Visitados"
+            android:text="@string/locais_visitados"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp" />
 
-        <!-- Container para locais dinâmicos -->
         <LinearLayout
             android:id="@+id/containerLocais"
             android:layout_width="match_parent"
@@ -149,7 +140,7 @@
                 android:id="@+id/tvAdicionarRemoverLocal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Adicionar/Remover Local"
+                android:text="@string/adicionar_remover_local"
                 android:textSize="14sp"
                 android:layout_marginEnd="8dp"/>
 
@@ -158,7 +149,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_input_add"
-                android:contentDescription="Adicionar Local" />
+                android:contentDescription="@string/adicionar_local" />
 
             <ImageView
                 android:id="@+id/btnRemoverUltimoLocal"
@@ -166,20 +157,17 @@
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_delete"
                 android:layout_marginStart="8dp"
-                android:contentDescription="Remover Último Local" />
+                android:contentDescription="@string/remover_ultimo_local" />
         </LinearLayout>
-        <!-- Fim da seção de Locais -->
 
-        <!-- Seção de Fotos -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fotos da Viagem"
+            android:text="@string/fotos_da_viagem"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="24dp" />
 
-        <!-- Botão para acessar o álbum de fotos -->
         <LinearLayout
             android:id="@+id/btnAcessarFotos"
             android:layout_width="match_parent"
@@ -192,7 +180,6 @@
             android:clickable="true"
             android:focusable="true">
 
-            <!-- Preview de fotos (até 3) -->
             <LinearLayout
                 android:id="@+id/containerPreviewFotos"
                 android:layout_width="0dp"
@@ -204,7 +191,7 @@
                     android:id="@+id/tvQuantidadeFotos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Carregue para acessar fotos"
+                    android:text="@string/carregue_para_acessar_fotos"
                     android:textSize="14sp"/>
             </LinearLayout>
 
@@ -215,12 +202,11 @@
                 android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <!-- Botão Salvar -->
         <Button
             android:id="@+id/btnCriar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Salvar"
+            android:text="@string/salvar"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp" />
     </LinearLayout>

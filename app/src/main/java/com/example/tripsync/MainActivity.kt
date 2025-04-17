@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inicializar Firebase
+        //mmmmmmmmmmm
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -31,22 +31,23 @@ class MainActivity : AppCompatActivity() {
         val registerButton = findViewById<Button>(R.id.registerButton)
         val forgotPassword = findViewById<TextView>(R.id.forgotPassword)
 
-        // Configurar botão de login
+        // lgnbtn
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.preencha_todos_os_campos), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Mostrar progresso
+            //mais prgrss dialog
             val progressDialog = android.app.ProgressDialog(this)
-            progressDialog.setMessage("A iniciar sessão...")
+            progressDialog.setMessage(getString(R.string.a_iniciar_sessao))
             progressDialog.show()
 
-            // Autenticar com Firebase
+            // bulk of the code, autenticar user na firebase
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     progressDialog.dismiss()
@@ -54,73 +55,73 @@ class MainActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         val user = auth.currentUser
 
-                        // Verificar diretamente se o email está verificado no Firebase Auth
+                        // ver se o email ta verificado or nah
                         if (user != null && user.isEmailVerified) {
-                            // Email já verificado, redirecionar para HomeActivity
-                            updateUserVerificationStatus(user.uid) // Manter Firestore sincronizado
+                            //se sim redirecionar para a home
+                            updateUserVerificationStatus(user.uid) // enquanto se mantém tudo sincronizado
                             startActivity(Intent(this, HomeActivity::class.java))
                             finish()
                         } else {
-                            // Email não verificado, mostrar mensagem
+                            // not verificatreds men ))
                             Toast.makeText(
                                 this,
-                                "Por favor, verifique o seu email antes de fazer login",
+                                getString(R.string.verifique_o_seu_email),
                                 Toast.LENGTH_LONG
                             ).show()
 
-                            // Oferecer reenvio do email de verificação
+                            // reenvio se o usr quiser
                             AlertDialog.Builder(this)
-                                .setTitle("Email não verificado")
-                                .setMessage("Deseja reenviar o email de verificação?")
-                                .setPositiveButton("Sim") { dialog, _ ->
+                                .setTitle(getString(R.string.email_nao_verificado))
+                                .setMessage(getString(R.string.deseja_reenviar_o_email))
+                                .setPositiveButton(getString(R.string.sim)) { dialog, _ ->
                                     user?.sendEmailVerification()
                                         ?.addOnCompleteListener { verificationTask ->
                                             if (verificationTask.isSuccessful) {
                                                 Toast.makeText(
                                                     this,
-                                                    "Email de verificação reenviado",
+                                                    getString(R.string.email_reenviado),
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             } else {
                                                 Toast.makeText(
                                                     this,
-                                                    "Erro ao reenviar email: ${verificationTask.exception?.message}",
+                                                    getString(R.string.erro_ao_reenviar_email) +  " ${verificationTask.exception?.message}",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             }
                                         }
                                     dialog.dismiss()
                                 }
-                                .setNegativeButton("Não") { dialog, _ ->
+                                .setNegativeButton(getString(R.string.nao)) { dialog, _ ->
                                     dialog.dismiss()
                                 }
                                 .show()
 
-                            // Fazer logout do usuário não verificado
+                            // logout do usr
                             auth.signOut()
                         }
                     } else {
                         // Falha no login
                         Toast.makeText(
                             this,
-                            "Falha no login: ${task.exception?.message}",
+                            getString(R.string.falha_no_login) + " ${task.exception?.message}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
         }
 
-        // Link para tela de registro
+        // intent se quiser registar
         registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        // Link para recuperação de senha
+        // link recuperar senha
         forgotPassword.setOnClickListener {
             val email = emailInput.text.toString()
             if (email.isEmpty()) {
                 Toast.makeText(
-                    this, "Insira o seu email para recuperar a senha",
+                    this, getString(R.string.insira_o_seu_email_para_recuperar_a_senha),
                     Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
@@ -131,13 +132,13 @@ class MainActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         Toast.makeText(
                             this,
-                            "Email de recuperação enviado para $email",
+                            getString(R.string.email_de_recuperacao_enviado_para) +  " $email",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
                         Toast.makeText(
                             this,
-                            "Erro ao enviar email de recuperação: ${task.exception?.message}",
+                            getString(R.string.erro_ao_enviar_email_de_recuperacao) + " ${task.exception?.message}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -147,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Verificar se o usuário está logado e com email verificado
+        // email verified? se sim passa de activity
         val currentUser = auth.currentUser
         if (currentUser != null && currentUser.isEmailVerified) {
             startActivity(Intent(this, HomeActivity::class.java))
@@ -161,6 +162,7 @@ class MainActivity : AppCompatActivity() {
             db.collection("usuarios").document(userId)
                 .update("emailVerificado", user.isEmailVerified)
                 .addOnFailureListener { e ->
+                    // handle do erro, dev shi
                     Log.e("MainActivity", "Erro ao atualizar status de verificação: ${e.message}")
                 }
         }

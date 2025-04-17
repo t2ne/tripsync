@@ -11,7 +11,7 @@
         android:id="@+id/tvLocalLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Local 1"
+        android:text="@string/local_1"
         android:textSize="14sp"
         android:layout_marginEnd="8dp"/>
 
@@ -20,7 +20,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="Digite o local visitado"
+        android:autofillHints=""
+        android:hint="@string/digite_o_local_visitado"
         android:inputType="text"
         android:background="@android:drawable/edit_text" />
 </LinearLayout>

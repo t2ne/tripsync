@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Botão voltar -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -18,41 +17,43 @@
             android:contentDescription="Voltar"
             android:src="@drawable/back" />
 
-        <!-- Título -->
         <TextView
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Criar Viagem"
+            android:text="@string/criar_viagem"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="40dp" />
 
-        <!-- Campos -->
         <EditText
             android:id="@+id/etNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nome da Viagem*"
+            android:autofillHints="name"
+            android:hint="@string/nome_da_viagem"
             android:layout_below="@id/titleText"
             android:layout_marginTop="32dp"
-            android:background="@android:drawable/edit_text" />
+            android:background="@android:drawable/edit_text"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/etData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data"
+            android:autofillHints=""
+            android:hint="@string/data"
             android:layout_below="@id/etNome"
             android:layout_marginTop="16dp"
-            android:background="@android:drawable/edit_text" />
+            android:background="@android:drawable/edit_text"
+            android:inputType="date" />
 
         <EditText
             android:id="@+id/etDescricao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descrição"
+            android:hint="@string/descricao"
             android:layout_below="@id/etData"
             android:layout_marginTop="16dp"
             android:background="@android:drawable/edit_text" />
@@ -61,23 +62,23 @@
             android:id="@+id/etClassificacao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Classificação"
+            android:autofillHints=""
+            android:hint="@string/classificacao"
             android:layout_below="@id/etDescricao"
             android:layout_marginTop="16dp"
-            android:background="@android:drawable/edit_text" />
+            android:background="@android:drawable/edit_text"
+            android:inputType="numberDecimal" />
 
-        <!-- Título da seção de locais -->
         <TextView
             android:id="@+id/tvLocaisTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Locais Visitados"
+            android:text="@string/locais_visitados"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_below="@id/etClassificacao"
             android:layout_marginTop="24dp" />
 
-        <!-- Container para locais dinâmicos -->
         <LinearLayout
             android:id="@+id/containerLocais"
             android:layout_width="match_parent"
@@ -99,7 +100,7 @@
                 android:id="@+id/tvAdicionarRemoverLocal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Adicionar/Remover Local"
+                android:text="@string/adicionar_remover_local"
                 android:textSize="14sp"
                 android:layout_marginEnd="8dp"/>
 
@@ -108,7 +109,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_input_add"
-                android:contentDescription="Adicionar Local" />
+                android:contentDescription="@string/adicionar_local" />
 
             <ImageView
                 android:id="@+id/btnRemoverUltimoLocal"
@@ -116,15 +117,14 @@
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_delete"
                 android:layout_marginStart="8dp"
-                android:contentDescription="Remover Último Local" />
+                android:contentDescription="@string/remover_ultimo_local" />
         </LinearLayout>
 
-        <!-- Botão CRIAR -->
         <Button
             android:id="@+id/btnCriarViagem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CRIAR +"
+            android:text="@string/criar"
             android:layout_centerHorizontal="true"
             android:layout_below="@id/containerBtnAdicionarLocal"
             android:layout_marginTop="32dp"

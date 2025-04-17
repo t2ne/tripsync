@@ -9,6 +9,7 @@
         android:id="@+id/imgFotoDetalhe"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:contentDescription="@string/imagem_da_foto"
         android:scaleType="centerCrop"
         android:layout_marginBottom="16dp" />
 
@@ -21,7 +22,8 @@
             android:id="@+id/etDescricaoFoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descrição da foto"
+            android:autofillHints="description"
+            android:hint="@string/descricao_da_foto"
             android:inputType="textMultiLine"
             android:maxLines="3" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -35,7 +37,8 @@
             android:id="@+id/etDataFoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data da foto"
+            android:autofillHints=""
+            android:hint="@string/data_da_foto"
             android:inputType="date" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -48,14 +51,15 @@
             android:id="@+id/etClassificacaoFoto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Classificação (1-5)"
+            android:autofillHints=""
+            android:hint="@string/classificacao_1_5"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Local"
+        android:text="@string/local"
         android:layout_marginTop="8dp" />
 
     <Spinner
@@ -76,7 +80,7 @@
             android:id="@+id/btnExcluirFoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Excluir"
+            android:text="@string/excluir"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#FF5252" />
 
@@ -84,7 +88,7 @@
             android:id="@+id/btnSalvarDetalhesFoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Salvar" />
+            android:text="@string/salvar" />
     </LinearLayout>
 
 </LinearLayout>

@@ -14,14 +14,15 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
+// isto é para salvar as imagens no armazenamento interno
 object ImageUtils {
-    // Salvar imagem no armazenamento interno
     suspend fun saveImageToInternalStorage(
         context: Context,
         imageUri: Uri,
         id: String,
         type: String
     ): String = withContext(Dispatchers.IO) {
+
         try {
             val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
             val filename = "$type-$id-${System.currentTimeMillis()}.jpg"
@@ -31,7 +32,7 @@ object ImageUtils {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
             }
 
-            // Salvar caminho no banco Room
+            // salvar o caminho da imagem no room
             val dao = AppDatabase.getDatabase(context).imageDao()
             dao.insertImage(ImageEntity(id, file.absolutePath, type))
 
@@ -42,7 +43,7 @@ object ImageUtils {
         }
     }
 
-    // Obter Uri para uma imagem a partir do caminho
+    // bitmap da imagem a partir do URI
     fun getImageUriFromPath(context: Context, path: String): Uri {
         val file = File(path)
         return if (file.exists()) {
@@ -56,13 +57,13 @@ object ImageUtils {
         }
     }
 
-    // Buscar caminho da imagem do Room
+    // ir buscar o caminho da imagem no room
     suspend fun getImagePath(context: Context, id: String, type: String): String? = withContext(Dispatchers.IO) {
         val dao = AppDatabase.getDatabase(context).imageDao()
         return@withContext dao.getImage(id, type)?.imagePath
     }
 
-    // Deletar imagem
+    // eliminar a imagem
     suspend fun deleteImage(context: Context, id: String, type: String) = withContext(Dispatchers.IO) {
         val dao = AppDatabase.getDatabase(context).imageDao()
         val image = dao.getImage(id, type)

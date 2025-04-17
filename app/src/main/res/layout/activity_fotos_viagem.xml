@@ -6,7 +6,6 @@
     android:background="#FFFFFF"
     tools:context=".FotosViagemActivity">
 
-    <!-- Barra do topo -->
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -21,10 +20,9 @@
             android:padding="12dp"
             android:layout_centerVertical="true"
             android:src="@drawable/back"
-            android:contentDescription="Voltar" />
+            android:contentDescription="@string/voltar" />
     </RelativeLayout>
 
-    <!-- Botão para adicionar fotos -->
     <Button
         android:id="@+id/btnAdicionarFotos"
         android:layout_width="match_parent"
@@ -33,12 +31,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Adicionar Fotos"
+        android:text="@string/adicionar_fotos"
         android:drawableStart="@android:drawable/ic_input_add"
         android:drawablePadding="8dp"
         android:gravity="center" />
 
-    <!-- Grid de fotos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerFotos"
         android:layout_width="match_parent"

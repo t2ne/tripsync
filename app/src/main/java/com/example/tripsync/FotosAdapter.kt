@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
+// agora um adapter para exibir fotos de uma viagem
 class FotosAdapter(
     private val fotos: List<FotoViagem>,
     private val onFotoClick: (FotoViagem) -> Unit
@@ -17,6 +18,7 @@ class FotosAdapter(
         val imgFoto: ImageView = itemView.findViewById(R.id.imgFoto)
     }
 
+    // view holder basic
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FotoViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_foto, parent, false)
@@ -26,7 +28,7 @@ class FotosAdapter(
     override fun onBindViewHolder(holder: FotoViewHolder, position: Int) {
         val foto = fotos[position]
 
-        // Carregar imagem a partir do caminho armazenado
+        // carregar a imagem da foto pelo caminho
         if (foto.fotoUrl.isNotEmpty()) {
             val file = File(foto.fotoUrl)
             if (file.exists()) {
@@ -34,7 +36,7 @@ class FotosAdapter(
             }
         }
 
-        // Configurar clique na foto
+        // config do clique/carreguar na foto
         holder.itemView.setOnClickListener {
             onFotoClick(foto)
         }

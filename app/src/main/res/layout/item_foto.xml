@@ -11,6 +11,6 @@
         android:id="@+id/imgFoto"
         android:layout_width="match_parent"
         android:layout_height="120dp"
+        android:contentDescription="@string/imagem_da_foto"
         android:scaleType="centerCrop" />
-
 </androidx.cardview.widget.CardView>

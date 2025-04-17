@@ -3,6 +3,7 @@ package com.example.tripsync
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+// data class q representa uma foto de viagem, useful asf
 @Parcelize
 data class FotoViagem(
     val id: String = "",

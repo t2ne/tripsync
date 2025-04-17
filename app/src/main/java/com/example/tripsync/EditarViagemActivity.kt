@@ -1,5 +1,6 @@
 package com.example.tripsync
 
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isNotEmpty
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,7 +26,7 @@ class EditarViagemActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private var imagePath: String = ""
 
-    // Componentes dos locais
+    // the componentes dos locais
     private lateinit var containerLocais: LinearLayout
     private lateinit var btnAdicionarLocal: ImageView
     private lateinit var btnRemoverUltimoLocal: ImageView
@@ -35,60 +37,59 @@ class EditarViagemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editar_viagem)
 
-        // Inicializar Firebase
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Recebe dados
+        // recebe os dados que passamos da home activity
         val nome = intent.getStringExtra("nomeViagem") ?: ""
         viagemId = intent.getStringExtra("viagemId") ?: ""
 
-        // Inicializar componentes dos locais
+        // init mais components
         containerLocais = findViewById(R.id.containerLocais)
         btnAdicionarLocal = findViewById(R.id.btnAdicionarLocal)
         btnRemoverUltimoLocal = findViewById(R.id.btnRemoverUltimoLocal)
         tvAdicionarRemoverLocal = findViewById(R.id.tvAdicionarRemoverLocal)
 
-        // Configurar botão de adicionar local
+        // config add local
         btnAdicionarLocal.setOnClickListener {
             if (containerLocais.childCount < MAX_LOCAIS) {
                 adicionarNovoLocal()
 
-                // Ocultar apenas o botão + quando atingir o limite
+                // outra vez a cena do limite
                 if (containerLocais.childCount >= MAX_LOCAIS) {
                     btnAdicionarLocal.visibility = View.GONE
                 }
             }
         }
 
-        // Configurar botão de remover último local
+        //again btn do ultimo local
         btnRemoverUltimoLocal.setOnClickListener {
             if (containerLocais.childCount > 1) {
                 removerUltimoLocal()
             } else {
-                Toast.makeText(this, "É necessário pelo menos um local!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.necessario_pelo_menos_1_local), Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Carregar dados da viagem do Firestore
         carregarDadosViagem()
 
-        // Botão Voltar
+        // bck btn
         val btnVoltar = findViewById<ImageView>(R.id.btnVoltar)
         btnVoltar.setOnClickListener {
             finish()
         }
 
-        // Botão Salvar
+        // save
         val btnCriar = findViewById<Button>(R.id.btnCriar)
         btnCriar.setOnClickListener {
             salvarAlteracoes()
         }
 
-        // Configuração do botão para acessar o álbum de fotos
+        // config do btn para acessar fotos
         val btnAcessarFotos = findViewById<LinearLayout>(R.id.btnAcessarFotos)
         btnAcessarFotos.setOnClickListener {
-            // Abrir a atividade de fotos
+
+            // fotos viagem activity tp
             val intent = Intent(this, FotosViagemActivity::class.java).apply {
                 putExtra("viagemId", viagemId)
                 putExtra("nomeViagem", findViewById<EditText>(R.id.edtNomeViagem).text.toString())
@@ -97,6 +98,7 @@ class EditarViagemActivity : AppCompatActivity() {
         }
     }
 
+    // mtd para ir buscar os dados da viagem needed
     private fun carregarDadosViagem() {
         val userId = auth.currentUser?.uid ?: return
 
@@ -112,29 +114,29 @@ class EditarViagemActivity : AppCompatActivity() {
                     findViewById<EditText>(R.id.edtDescricao).setText(document.getString("descricao"))
                     findViewById<EditText>(R.id.edtClassificacao).setText(document.getString("classificacao"))
 
-                    // Guardar o caminho da imagem
+                    // imgpth
                     imagePath = document.getString("fotoUrl") ?: ""
 
-                    // Atualizar contador de fotos (opcional)
-                    atualizarContadorFotos()
+                    // (opcional) counting
+                    atualizarCounterFotos()
 
-                    // Carregar locais se existirem
+                    // se houverem locais, carregar
                     val locais = document.get("locais") as? List<String>
                     if (!locais.isNullOrEmpty()) {
                         carregarLocaisExistentes(locais)
                     } else {
-                        // Adicionar pelo menos um local vazio
+                        // 1 local por defeito vzio
                         adicionarNovoLocal()
                     }
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao carregar dados: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.erro_ao_carregar_dados) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     // Método para atualizar o contador de fotos
-    private fun atualizarContadorFotos() {
+    private fun atualizarCounterFotos() {
         val userId = auth.currentUser?.uid ?: return
         val tvQuantidadeFotos = findViewById<TextView>(R.id.tvQuantidadeFotos)
 
@@ -148,34 +150,36 @@ class EditarViagemActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 val numFotos = documents.size()
                 tvQuantidadeFotos.text = when {
-                    numFotos == 0 -> "Carregue para acessar fotos"
-                    numFotos == 1 -> "1 foto"
-                    else -> "$numFotos fotos"
+                    numFotos == 0 -> getString(R.string.carregue_para_acessar_fotos)
+                    numFotos == 1 -> getString(R.string.uma_foto)
+                    else -> "$numFotos" + getString(R.string.fotos)
                 }
             }
             .addOnFailureListener {
-                tvQuantidadeFotos.text = "Carregue para acessar fotos"
+                tvQuantidadeFotos.text = getString(R.string.carregue_para_acessar_fotos)
             }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun carregarLocaisExistentes(locais: List<String>) {
-        // Limpar container de locais
+
+        //clean do container dos locais antes de adicionar os novos
         containerLocais.removeAllViews()
 
-        // Adicionar cada local
+        // add cada local
         for (local in locais) {
             val localView = LayoutInflater.from(this).inflate(R.layout.item_local, containerLocais, false)
             val indice = containerLocais.childCount + 1
             val tvLocalLabel = localView.findViewById<TextView>(R.id.tvLocalLabel)
             val etLocal = localView.findViewById<EditText>(R.id.etLocal)
 
-            tvLocalLabel.text = "Local $indice"
+            tvLocalLabel.text = getString(R.string.local) + " $indice"
             etLocal.setText(local)
 
             containerLocais.addView(localView)
         }
 
-        // Atualizar visibilidade do botão de adicionar
+        // update visibility do btn de adicionar
         if (containerLocais.childCount >= MAX_LOCAIS) {
             btnAdicionarLocal.visibility = View.GONE
         } else {
@@ -189,16 +193,16 @@ class EditarViagemActivity : AppCompatActivity() {
 
         val indice = containerLocais.childCount + 1
         val tvLocalLabel = localView.findViewById<TextView>(R.id.tvLocalLabel)
-        tvLocalLabel.text = "Local $indice"
+        tvLocalLabel.text = getString(R.string.local) + " $indice"
 
         containerLocais.addView(localView)
     }
 
     private fun removerUltimoLocal() {
-        if (containerLocais.childCount > 0) {
+        if (containerLocais.isNotEmpty()) {
             containerLocais.removeViewAt(containerLocais.childCount - 1)
 
-            // Mostrar botão de adicionar se estiver abaixo do limite
+            // rmover o ultimo local nuh uh
             if (containerLocais.childCount < MAX_LOCAIS) {
                 btnAdicionarLocal.visibility = View.VISIBLE
             }
@@ -227,20 +231,21 @@ class EditarViagemActivity : AppCompatActivity() {
         val novaClassificacao = findViewById<EditText>(R.id.edtClassificacao).text.toString()
 
         if (novoNome.isBlank()) {
-            Toast.makeText(this, "O nome da viagem é obrigatório", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,
+                getString(R.string.o_nome_da_viagem_obrigatorio), Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Coletar locais preenchidos
+        // ir buscar locais preenchidos
         getLocais()
 
-        // Mostrar progresso
+        // prgrss again
         val progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("Salvando alterações...")
+        progressDialog.setMessage(getString(R.string.a_salvar_alteracoes))
         progressDialog.show()
 
         lifecycleScope.launch {
-            // Criar objeto com os dados atualizados
+            // new obj
             val viagemAtualizada = hashMapOf(
                 "nome" to novoNome,
                 "data" to novaData,
@@ -249,8 +254,6 @@ class EditarViagemActivity : AppCompatActivity() {
                 "fotoUrl" to imagePath,
                 "locais" to locaisViagem
             )
-
-            // Atualizar no Firestore
             atualizarViagem(userId, viagemAtualizada, progressDialog)
         }
     }
@@ -267,13 +270,14 @@ class EditarViagemActivity : AppCompatActivity() {
             .update(viagemAtualizada)
             .addOnSuccessListener {
                 progressDialog.dismiss()
-                Toast.makeText(this, "Viagem atualizada com sucesso!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.viagem_atualizada), Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
             }
             .addOnFailureListener { e ->
                 progressDialog.dismiss()
-                Toast.makeText(this, "Erro ao atualizar viagem: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.erro_ao_atualizar_viagem) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
