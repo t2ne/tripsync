@@ -115,7 +115,7 @@ class HomeActivity : AppCompatActivity() {
             // adicionar os filtros em si,
             val filtroOptions = arrayOf(getString(R.string.nome_z_a),
                 getString(R.string.nome_a_z),
-                getString(R.string.data_mais_antiga), getString(R.string.data_mais_recente))
+                getString(R.string.data_mais_recente), getString(R.string.data_mais_antiga))
             val adapterFiltro = ArrayAdapter(this, android.R.layout.simple_spinner_item, filtroOptions)
             adapterFiltro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerFiltro.adapter = adapterFiltro

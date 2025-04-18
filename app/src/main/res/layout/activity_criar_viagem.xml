@@ -47,7 +47,8 @@
             android:layout_below="@id/etNome"
             android:layout_marginTop="16dp"
             android:background="@android:drawable/edit_text"
-            android:inputType="date" />
+            android:focusable="true"
+            android:clickable="true" />
 
         <EditText
             android:id="@+id/etDescricao"
