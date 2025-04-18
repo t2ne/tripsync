@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
 
+// finalmente, fotos da viagem actvt
 class FotosViagemActivity : AppCompatActivity() {
 
     private lateinit var recyclerFotos: RecyclerView
@@ -34,12 +35,14 @@ class FotosViagemActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+
     private lateinit var viagemId: String
     private lateinit var nomeViagem: String
     private var locaisViagem: List<String> = emptyList()
     private val fotosList = mutableListOf<FotoViagem>()
     private var fotosAdapter: FotosAdapter? = null
 
+    // const para por um máximo de fotos at once
     companion object {
         private const val PICK_MULTIPLE_IMAGES = 100
     }
@@ -48,32 +51,31 @@ class FotosViagemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fotos_viagem)
 
-        // Inicializar Firebase
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Obter os dados da intent
+        // ir buscar dados ao intent da edit viagem
         viagemId = intent.getStringExtra("viagemId") ?: ""
-        nomeViagem = intent.getStringExtra("nomeViagem") ?: "Fotos da Viagem"
+        nomeViagem = intent.getStringExtra("nomeViagem") ?: getString(R.string.fotos_da_viagem)
 
-        // Inicializar views
+        // init das views
         recyclerFotos = findViewById(R.id.recyclerFotos)
         btnAdicionarFotos = findViewById(R.id.btnAdicionarFotos)
 
-        // Configurar RecyclerView
+        // config recycler view
         recyclerFotos.layoutManager = GridLayoutManager(this, 3)
 
-        // Configurar botão voltar
+        // quase último bckbtn
         findViewById<ImageView>(R.id.btnVoltar).setOnClickListener {
             finish()
         }
 
-        // Configurar botão adicionar fotos
+        // btn de add das fotos
         btnAdicionarFotos.setOnClickListener {
             selecionarMultiplasFotos()
         }
 
-        // Carregar os dados da viagem (incluindo locais)
+        // ir buscar os dados da viagem (locais em ids)
         carregarDadosViagem()
     }
 
@@ -87,15 +89,16 @@ class FotosViagemActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    // Obter a lista de locais da viagem
+                    // ir buscar a lista dos locais para depois dar o link dos locais entre as fotos tmb
                     locaisViagem = document.get("locais") as? List<String> ?: emptyList()
 
-                    // Agora carregar as fotos
+                    // loadfotos
                     carregarFotos()
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao carregar dados da viagem: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.erro_ao_carregar_dados_da_viagem) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -117,24 +120,25 @@ class FotosViagemActivity : AppCompatActivity() {
                         fotosList.add(foto)
                     }
                 }
+                // ordenar fotos pela data
+                fotosList.sortByDescending { it.data }
 
-                // Ordenar fotos (opcional)
-                // fotosList.sortByDescending { it.data }
-
-                // Atualizar o RecyclerView
+                // update do recycler
                 fotosAdapter = FotosAdapter(fotosList) { foto ->
                     mostrarDetalhesFoto(foto)
                 }
                 recyclerFotos.adapter = fotosAdapter
 
-                // Atualizar a UI baseada no número de fotos
+                // e finally update do UI
                 atualizarUI()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao carregar fotos: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.erro_ao_carregar_fotos) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
+    // update do UI, kinda useless mas pronto
     private fun atualizarUI() {
         if (fotosList.isEmpty()) {
             recyclerFotos.visibility = View.GONE
@@ -143,11 +147,12 @@ class FotosViagemActivity : AppCompatActivity() {
         }
     }
 
+    // selecionar multiplas fotos da galeria, downloads etc
     private fun selecionarMultiplasFotos() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        startActivityForResult(Intent.createChooser(intent, "Selecione fotos"), PICK_MULTIPLE_IMAGES)
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.selecione_fotos)), PICK_MULTIPLE_IMAGES)
     }
 
     private fun mostrarDetalhesFoto(foto: FotoViagem) {
@@ -160,29 +165,29 @@ class FotosViagemActivity : AppCompatActivity() {
         val btnExcluirFoto = dialogView.findViewById<Button>(R.id.btnExcluirFoto)
         val btnSalvarDetalhesFoto = dialogView.findViewById<Button>(R.id.btnSalvarDetalhesFoto)
 
-        // Criando o AlertDialog para mostrar os detalhes - MOVIDO PARA CIMA
+        // criar o alert dialog para mostrar detalhes - MOVIDO PARA CIMA
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(true)
             .create()
 
-        // Mostrar a imagem
+        // show the img
         val file = File(foto.fotoUrl)
         if (file.exists()) {
             imgFotoDetalhe.setImageURI(Uri.fromFile(file))
         }
 
-        // Preencher os campos com os dados existentes
+        // fill dos campos com os detalhes ditos nel PDF
         etDescricaoFoto.setText(foto.descricao)
         etDataFoto.setText(foto.data)
         etClassificacaoFoto.setText(foto.classificacao)
 
-        // Configurar spinner de locais
+        // spinner para locais (dropdown)
         val locaisAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, locaisViagem)
         locaisAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerLocal.adapter = locaisAdapter
 
-        // Selecionar o local atual da foto (se existir)
+        // se a foto já tiver um localId, selecionar o local correspondente no spinner
         if (foto.localId.isNotEmpty()) {
             try {
                 val index = foto.localId.toInt()
@@ -190,26 +195,26 @@ class FotosViagemActivity : AppCompatActivity() {
                     spinnerLocal.setSelection(index)
                 }
             } catch (e: NumberFormatException) {
-                // Se não for um número, ignorar
+                // se não for um num ignorar
             }
         }
 
         btnExcluirFoto.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Excluir Foto")
-                .setMessage("Tem certeza que deseja excluir esta foto?")
-                .setPositiveButton("Sim") { confirmDialog, _ ->
+                .setTitle(getString(R.string.excluir_foto))
+                .setMessage(getString(R.string.tem_certeza_que_deseja_excluir_esta_foto))
+                .setPositiveButton(getString(R.string.sim)) { confirmDialog, _ ->
                     excluirFoto(foto)
                     confirmDialog.dismiss()
-                    dialog.dismiss() // Agora a variável dialog já está definida
+                    dialog.dismiss() // variavel dialog já definida
                 }
-                .setNegativeButton("Não") { confirmDialog, _ ->
+                .setNegativeButton(getString(R.string.nao)) { confirmDialog, _ ->
                     confirmDialog.dismiss()
                 }
                 .show()
         }
 
-        // Configurar o botão de salvar
+        // config do save btn, carrega e os dados são updated
         btnSalvarDetalhesFoto.setOnClickListener {
             val descricao = etDescricaoFoto.text.toString()
             val data = etDataFoto.text.toString()
@@ -219,14 +224,13 @@ class FotosViagemActivity : AppCompatActivity() {
             atualizarDetalhesFoto(foto, descricao, data, classificacao, localIndex)
             dialog.dismiss()
         }
-
         dialog.show()
     }
 
     private fun excluirFoto(foto: FotoViagem) {
         val userId = auth.currentUser?.uid ?: return
 
-        // Referência ao documento da foto
+        // referência ao doc da foto
         val fotoRef = db.collection("usuarios")
             .document(userId)
             .collection("viagens")
@@ -234,34 +238,37 @@ class FotosViagemActivity : AppCompatActivity() {
             .collection("fotos")
             .document(foto.id)
 
-        // Excluir completamente o documento
+        // excluir completamente o doc da foto
         fotoRef.delete()
             .addOnSuccessListener {
-                // Excluir o arquivo da imagem do armazenamento interno
+                // delete o arquivo do armazenamento interno
                 try {
                     val file = File(foto.fotoUrl)
                     if (file.exists()) {
                         file.delete()
                     }
                 } catch (e: Exception) {
-                    // Ignorar erros de exclusão de arquivo
+                    // ignorar erros tbh, not worth it
                 }
 
-                // Atualizar a lista e o adapter
+                // update da lista e do adapter
                 fotosList.remove(foto)
                 fotosAdapter?.notifyDataSetChanged()
                 atualizarUI()
 
-                Toast.makeText(this, "Foto excluída com sucesso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.foto_excluida_com_sucesso), Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao excluir foto: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.erro_ao_excluir_foto) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun atualizarDetalhesFoto(foto: FotoViagem, descricao: String, data: String, classificacao: String, localId: String) {
         val userId = auth.currentUser?.uid ?: return
 
+        // update dos detalhes da foto na firestore, hashmap again para segurança
         val fotoAtualizada = hashMapOf(
             "descricao" to descricao,
             "data" to data,
@@ -277,7 +284,7 @@ class FotosViagemActivity : AppCompatActivity() {
             .document(foto.id)
             .update(fotoAtualizada as Map<String, Any>)
             .addOnSuccessListener {
-                // Criar uma nova instância atualizada do objeto
+                // nova instance do obj :)
                 val fotoAtualizado = FotoViagem(
                     id = foto.id,
                     fotoUrl = foto.fotoUrl,
@@ -288,17 +295,19 @@ class FotosViagemActivity : AppCompatActivity() {
                     isDeleted = foto.isDeleted
                 )
 
-                // Encontrar e substituir o objeto na lista
+                // find e substitute na lista
                 val index = fotosList.indexOfFirst { it.id == foto.id }
                 if (index != -1) {
                     fotosList[index] = fotoAtualizado
                     fotosAdapter?.notifyItemChanged(index)
                 }
 
-                Toast.makeText(this, "Detalhes atualizados com sucesso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.detalhes_atualizados_com_sucesso), Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Erro ao atualizar detalhes: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.erro_ao_atualizar_detalhes) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -313,16 +322,17 @@ class FotosViagemActivity : AppCompatActivity() {
                 val imageUris = mutableListOf<Uri>()
 
                 if (clipData != null) {
-                    // Seleção múltipla
+                    // seleção de múltiplas imagens
                     for (i in 0 until clipData.itemCount) {
                         val uri = clipData.getItemAt(i).uri
                         imageUris.add(uri)
                     }
                 } else if (singleUri != null) {
-                    // Seleção de uma única imagem
+                    // selectn de uma única imagem
                     imageUris.add(singleUri)
                 }
 
+                // simple check
                 if (imageUris.isNotEmpty()) {
                     processarFotosSelecionadas(imageUris)
                 }
@@ -334,20 +344,20 @@ class FotosViagemActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
 
         lifecycleScope.launch {
-            // Mostrar mensagem de carregamento
+            // mostrar ao user o progresso
             val loadingDialog = AlertDialog.Builder(this@FotosViagemActivity)
-                .setMessage("Processando fotos...")
+                .setMessage(getString(R.string.a_processar_fotos))
                 .setCancelable(false)
                 .create()
             loadingDialog.show()
 
             try {
-                // Processar cada imagem
+                // processar cada imagem
                 for (uri in uris) {
-                    // Gerar ID único para a foto
+                    // new id unico para cada foto
                     val fotoId = UUID.randomUUID().toString()
 
-                    // Salvar imagem no armazenamento interno
+                    // salvar imagem no storage interno
                     val fotoPath = ImageUtils.saveImageToInternalStorage(
                         this@FotosViagemActivity,
                         uri,
@@ -355,18 +365,18 @@ class FotosViagemActivity : AppCompatActivity() {
                         "photo"
                     )
 
-                    // Criar documento para a foto no Firestore
+                    // new doc para a foto
                     val novaFoto = FotoViagem(
                         id = fotoId,
                         fotoUrl = fotoPath,
                         descricao = "",
                         data = "",
                         classificacao = "",
-                        localId = "", // Inicialmente sem local
+                        localId = "", // init sem local, mas depois pode ser atualizado
                         isDeleted = false
                     )
 
-                    // Salvar no Firestore
+                    // save para a firestore
                     db.collection("usuarios")
                         .document(userId)
                         .collection("viagens")
@@ -376,16 +386,19 @@ class FotosViagemActivity : AppCompatActivity() {
                         .set(novaFoto)
                 }
 
-                // Finalizar
+                // finalize finalmente final fin
                 loadingDialog.dismiss()
-                Toast.makeText(this@FotosViagemActivity, "Fotos adicionadas com sucesso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@FotosViagemActivity,
+                    getString(R.string.fotos_adicionadas_com_sucesso), Toast.LENGTH_SHORT).show()
 
                 // Recarregar as fotos
                 carregarFotos()
 
             } catch (e: Exception) {
                 loadingDialog.dismiss()
-                Toast.makeText(this@FotosViagemActivity, "Erro ao processar fotos: ${e.message}", Toast.LENGTH_SHORT).show()
+                // erro ao processar as fotos, again just a lil toast
+                Toast.makeText(this@FotosViagemActivity,
+                    getString(R.string.erro_ao_processar_fotos) + " ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
