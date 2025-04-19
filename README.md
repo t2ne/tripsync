@@ -21,7 +21,7 @@ O TripSync foi criado a pensar em viajantes que pretendem organizar facilmente v
 
 ```
 TripSync
-├── Activities
+├── UI
 │   ├── LoginActivity
 │   ├── RegisterActivity
 │   ├── HomeActivity (Lista de Viagens)
@@ -47,7 +47,7 @@ TripSync
 
 A comunicação entre as diferentes partes da aplicação segue uma arquitetura em camadas, facilitando a manutenção e separação de preocupações:
 
-- **UI (Activities)**: Recebe input do utilizador e exibe os dados recebidos das fontes (Firebase/Room).
+- **UI**: Recebe input do utilizador e exibe os dados recebidos das fontes (Firebase/Room).
 - **Adapters**: Fazem a ponte entre os dados e os componentes visuais como RecyclerView.
 - **Models**: Estruturas que representam os dados usados localmente e remotamente.
 - **Database (Room)**: Permite guardar imagens localmente e aceder a elas offline.

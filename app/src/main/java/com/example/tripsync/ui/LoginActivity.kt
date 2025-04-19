@@ -1,4 +1,4 @@
-package com.example.tripsync.activities
+package com.example.tripsync.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_login)
 
         //mmmmmmmmmmm
         auth = FirebaseAuth.getInstance()

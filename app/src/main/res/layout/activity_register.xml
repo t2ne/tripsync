@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.RegisterActivity">
 
     <ImageView
         android:id="@+id/btnBack"

@@ -1,4 +1,4 @@
-package com.example.tripsync.activities
+package com.example.tripsync.ui
 
 import android.content.Intent
 import android.os.Bundle

@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    NOTA: Este ficheiro é apenas informativo para visualizar a estrutura de navegação do TripSync.
-    Não é utilizado diretamente pela app.
-    Usamos <fragment> apenas para evitar erros no editor.
--->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_structure"
@@ -11,7 +6,7 @@
 
     <activity
         android:id="@+id/loginFragment"
-        android:name="com.example.tripsync.activities.LoginActivity"
+        android:name="com.example.tripsync.ui.LoginActivity"
         android:label="Login">
         <action
             android:id="@+id/action_login_to_register"
@@ -23,7 +18,7 @@
 
     <activity
         android:id="@+id/registerFragment"
-        android:name="com.example.tripsync.activities.RegisterActivity"
+        android:name="com.example.tripsync.ui.RegisterActivity"
         android:label="Registo">
         <action
             android:id="@+id/action_register_to_login"
@@ -32,7 +27,7 @@
 
     <activity
         android:id="@+id/homeFragment"
-        android:name="com.example.tripsync.activities.HomeActivity"
+        android:name="com.example.tripsync.ui.HomeActivity"
         android:label="Home">
         <action
             android:id="@+id/action_home_to_criar"
@@ -47,12 +42,12 @@
 
     <activity
         android:id="@+id/criarFragment"
-        android:name="com.example.tripsync.activities.CriarViagemActivity"
+        android:name="com.example.tripsync.ui.CriarViagemActivity"
         android:label="Criar Viagem" />
 
     <activity
         android:id="@+id/editarFragment"
-        android:name="com.example.tripsync.activities.EditarViagemActivity"
+        android:name="com.example.tripsync.ui.EditarViagemActivity"
         android:label="Editar Viagem">
         <action
             android:id="@+id/action_editar_to_fotos"
@@ -61,11 +56,11 @@
 
     <activity
         android:id="@+id/fotosFragment"
-        android:name="com.example.tripsync.activities.FotosViagemActivity"
+        android:name="com.example.tripsync.ui.FotosViagemActivity"
         android:label="Fotos da Viagem" />
 
     <activity
         android:id="@+id/perfilFragment"
-        android:name="com.example.tripsync.activities.EditarPerfilActivity"
+        android:name="com.example.tripsync.ui.EditarPerfilActivity"
         android:label="Editar Perfil" />
 </navigation>
