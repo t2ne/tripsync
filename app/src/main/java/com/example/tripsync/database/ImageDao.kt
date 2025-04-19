@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/tripsync/database/ImageDao.kt -
 package com.example.tripsync.database
 
 import androidx.room.Dao
