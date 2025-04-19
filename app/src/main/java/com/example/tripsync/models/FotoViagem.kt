@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

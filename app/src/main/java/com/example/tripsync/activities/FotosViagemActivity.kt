@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.activities
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -18,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tripsync.R
+import com.example.tripsync.adapters.FotosAdapter
+import com.example.tripsync.models.FotoViagem
 import com.example.tripsync.utils.ImageUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

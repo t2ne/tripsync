@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.tripsync.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -101,7 +102,7 @@ class RegisterActivity : AppCompatActivity() {
                                 .addOnSuccessListener {
                                     progressDialog.dismiss()
 
-                                    val intent = Intent(this, MainActivity::class.java)
+                                    val intent = Intent(this, LoginActivity::class.java)
                                     startActivity(intent)
                                     finish()
                                 }

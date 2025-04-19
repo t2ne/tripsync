@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.activities
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isNotEmpty
 import androidx.lifecycle.lifecycleScope
+import com.example.tripsync.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch

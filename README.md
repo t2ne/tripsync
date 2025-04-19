@@ -1,99 +1,149 @@
+
 # ✈️ TripSync
 
-A smart travel planner app for Android developed in Kotlin. TripSync helps users organize, sync, and manage their trips effortlessly — from itinerary planning to shared checklists.
+**TripSync** é uma aplicação Android desenvolvida em Kotlin que permite aos utilizadores planear, organizar e sincronizar viagens de forma intuitiva e colaborativa. Inclui funcionalidades como criação de itinerários, partilha de planos, gestão de fotografias e suporte offline.
 
-## 🌟 Features
+---
 
-- **Trip Management**: Create, edit, and view detailed trip itineraries  
-- **Collaborative Sync**: Share trip plans and checklists with other users in real-time  
-- **Smart Reminders**: Get notified before key travel events or departures  
-- **Offline Support**: Access and update trip data even without internet  
-- **Interactive UI**: Sleek, user-friendly interface with intuitive navigation  
-- **Local Storage**: Persistent data with Room database  
-- **Secure Syncing**: Cloud sync via Firebase Authentication & Firestore  
+## 📖 Descrição do Projeto
 
-## 🛠️ Installation
+O TripSync foi criado a pensar em viajantes que pretendem organizar facilmente várias viagens num único local. A aplicação permite:
 
-### Clone the Repository
+- Criar e editar viagens com informações personalizadas
+- Adicionar e visualizar fotografias associadas às viagens
+- Partilhar planos com outros utilizadores
+- Utilizar a aplicação em modo offline, com sincronização posterior
+- Gerir várias viagens com uma interface simples e funcional
+
+---
+
+## 🧭 Estrutura do Projeto
+
+```
+TripSync
+├── Activities
+│   ├── MainActivity (Login)
+│   ├── RegisterActivity
+│   ├── HomeActivity (Lista de Viagens)
+│   ├── CriarViagemActivity
+│   ├── EditarViagemActivity
+│   ├── EditarPerfilActivity
+│   └── FotosViagemActivity
+├── Adapters
+│   ├── ViagemAdapter
+│   └── FotosAdapter
+├── Models
+│   ├── Viagem
+│   └── FotoViagem
+├── Utils
+│   └── ImageUtils
+└── Database
+    ├── AppDatabase
+    ├── ImageDao  
+    └── ImageEntity
+```
+
+---
+
+## 📦 Dependências e Tecnologias
+
+Este projeto utiliza as seguintes bibliotecas:
+
+- **Firebase Authentication** – Autenticação de utilizadores
+- **Firebase Firestore** – Armazenamento remoto de dados
+- **Firebase Storage** – Armazenamento de imagens na cloud
+- **Firebase Crashlytics** – Relatórios de falhas
+- **Room Database** – Armazenamento local de imagens
+- **ViewBinding** – Acesso seguro às views
+- **Material Components** – Interface moderna e consistente
+- **RecyclerView & CardView** – Listagem eficiente de dados
+- **Jetpack Libraries** – AppCompat, Core, Activity, ConstraintLayout
+- **Kotlin Coroutines** – Assíncrono e reativo
+- **MockK** – Testes unitários e de instrumentação
+
+---
+
+## 🔧 Configuração e Instalação
+
+### Requisitos
+
+- Android Studio Electric Eel ou superior
+- SDK Mínimo: Android 7.1 (API 25)
+- SDK Alvo: Android 14 (API 35)
+- Kotlin 1.9.0 ou superior
+- Java 11
+
+### Passos para Compilar
 
 ```bash
 git clone https://github.com/t2ne/tripsync.git
 ```
 
-### Open the Project
+1. Abrir o Android Studio
+2. Clonar projeto dum repositório remoto
+3. Colar o link https://github.com/t2ne/tripsync.git
+4. Criar o projeto
+5. Esperar pela sincronização do Gradle
+6. Ligar um dispositivo ou emulador
+7. Executar a aplicação
 
-1. Launch Android Studio
-2. Open the `tripsync` project directory
-3. Sync Gradle files
-4. Build and run on your emulator or device
+---
 
-### Requirements
+## 📱 Instruções de Utilização
 
-- Android Studio Electric Eel or newer
-- Minimum SDK: Android 21 (Lollipop)
-- Target SDK: Android 34
-- Kotlin version: 1.9.0 or newer
+1. Iniciar sessão ou criar conta
+2. Criar uma nova viagem com título, descrição e datas
+3. Associar locais à viagem
+4. Adicionar fotografias diretamente da galeria
+5. Editar ou apagar viagens conforme necessário
+6. Partilhar planos com outros utilizadores
 
-## 📂 Project Structure
+---
 
-- **app**: Main application module  
-  - **src/main**
-    - **java/com/example/tripsync**
-      - `MainActivity.kt`: App launcher and navigation controller
-      - `SplashActivity.kt`: Optional splash screen logic
-      - **data**
-        - `TripDatabase.kt`: Room database setup
-        - `TripDao.kt`: Data access layer
-        - `TripEntity.kt`: Trip model definitions
-      - **ui**
-        - `TripListFragment.kt`: Overview of planned trips
-        - `TripDetailFragment.kt`: View/edit trip details
-        - `ChecklistFragment.kt`: Shared trip checklist
-        - `SettingsFragment.kt`: App preferences and sync options
-      - **utils**
-        - `NotificationScheduler.kt`: Handles reminders
-        - `SyncManager.kt`: Manages Firebase sync operations
-    - **res**
-      - **layout**: Layout XMLs
-      - **navigation**: Navigation graph
-      - **values**: Strings, themes, styles
+## 📋 Requisitos Funcionais
 
-## 🔧 Usage
+- Criar, editar e eliminar viagens
+- Adicionar e remover fotografias associadas a viagens
+- Registar e autenticar utilizadores com a Firebase
+- Sincronizar dados com o Firestore (online e offline)
+- Guardar imagens localmente com o Room
+- Partilhar viagens com outros utilizadores
 
-1. Open the app and create a new trip  
-2. Add destinations, dates, and notes to build your itinerary  
-3. Invite collaborators to view or edit shared plans  
-4. Access trip checklists and receive timely notifications  
-5. Use the app offline — syncs when you're back online  
-6. Manage multiple trips with ease from a central hub  
+---
 
-## 📱 Supported Devices
+## ❗ Requisitos Não Funcionais
 
-- Android 5.0+ (Lollipop and above)  
-- Phones and tablets  
-- Internet required for cloud sync features  
+- A aplicação deve funcionar offline com sincronização automática quando estiver online
+- Interface intuitiva e responsiva
+- Compatibilidade com dispositivos Android API 25+
+- Performance fluída sem atrasos visíveis
+- Segurança garantida com autenticação via Firebase
+- Código modular e de fácil manutenção
 
-## 🔐 Permissions
+---
 
-- `android.permission.INTERNET`: For Firebase syncing  
-- `android.permission.VIBRATE`: For notifications  
+## 🔐 Permissões Utilizadas
 
-## 📚 Libraries Used
+A aplicação requer as seguintes permissões, definidas no `AndroidManifest.xml`:
 
-- Firebase Authentication & Firestore  
-- Room Database  
-- Material Design Components  
-- AndroidX Navigation  
-- ViewModel & LiveData  
-- Kotlin Coroutines  
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
 
-## 👤 Author
+<uses-permission
+    android:name="android.permission.READ_EXTERNAL_STORAGE"
+    android:maxSdkVersion="32" />
 
-t2ne - cyzuko
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+```
 
-## 🙏 Acknowledgments
+Estas permissões são utilizadas para:
 
-- Firebase for Android  
-- Android Jetpack Libraries  
-- Material Design  
-- Kotlin Community
+- Acesso à internet (Firebase)
+- Acesso à galeria de imagens (dependente da versão do Android)
+
+---
+
+## 👥 Autores
+
+- [t2ne](https://github.com/t2ne)
+- [cyzuko](https://github.com/cyzuko)

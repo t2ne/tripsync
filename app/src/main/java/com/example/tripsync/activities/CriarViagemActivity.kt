@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.activities
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.tripsync.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -131,7 +132,7 @@ class CriarViagemActivity : AppCompatActivity() {
                     getString(R.string.utilizador_nao_autenticado), Toast.LENGTH_SHORT).show()
 
                 // redirect para login
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             }
         }

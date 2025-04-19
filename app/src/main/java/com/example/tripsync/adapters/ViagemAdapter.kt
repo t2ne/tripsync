@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tripsync.R
+import com.example.tripsync.models.Viagem
 
 // adapter para exibir a lista de viagens
 class ViagemAdapter(

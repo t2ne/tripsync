@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.activities
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -19,22 +19,12 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tripsync.R
+import com.example.tripsync.adapters.ViagemAdapter
+import com.example.tripsync.models.Viagem
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
-// data class viagem, usada para armazenar informações de cada viagem
-// meti aqui mas dava para ter feito um adapter
-// separado, mas como é só uma lista de viagens acho q não vale a pena
-
-data class Viagem(
-    var id: String = "",
-    val nome: String = "",
-    val data: String = "",
-    val descricao: String = "",
-    val classificacao: String = "",
-    val fotoUrl: String = ""
-)
 
 class HomeActivity : AppCompatActivity() {
 
@@ -61,7 +51,7 @@ class HomeActivity : AppCompatActivity() {
         // logged in? então passa para a main
         if (auth.currentUser == null) {
             // redirect
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
@@ -97,7 +87,7 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("viagemId", viagem.id)
             intent.putExtra("nomeViagem", viagem.nome)
             startActivity(intent)
-        }, { position ->
+        }, { position: Int ->
             compartilharViagem(position)
         })
 

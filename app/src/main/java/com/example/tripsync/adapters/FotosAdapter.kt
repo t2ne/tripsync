@@ -1,4 +1,4 @@
-package com.example.tripsync
+package com.example.tripsync.adapters
 
 import android.net.Uri
 import android.view.LayoutInflater
@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tripsync.R
+import com.example.tripsync.models.FotoViagem
 import java.io.File
 
 // agora um adapter para exibir fotos de uma viagem
