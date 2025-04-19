@@ -43,6 +43,34 @@ TripSync
     └── ImageEntity
 ```
 
+### 🔄 Fluxos de Dados
+
+A comunicação entre as diferentes partes da aplicação segue uma arquitetura em camadas, facilitando a manutenção e separação de preocupações:
+
+- **UI (Activities)**: Recebe input do utilizador e exibe os dados recebidos das fontes (Firebase/Room).
+- **Adapters**: Fazem a ponte entre os dados e os componentes visuais como RecyclerView.
+- **Models**: Estruturas que representam os dados usados localmente e remotamente.
+- **Database (Room)**: Permite guardar imagens localmente e aceder a elas offline.
+- **Firebase (Firestore/Storage/Auth)**: Fonte de dados remota para sincronização, autenticação e armazenamento na cloud.
+- **Utils**: Suporte a operações repetitivas, como manipulação de imagens ou formatações.
+
+### 🔁 Interações Entre Componentes
+
+- **LoginActivity ↔ Firebase Auth**  
+  Permite iniciar sessão e autenticar utilizadores. Em caso de sucesso, redireciona para a HomeActivity.
+
+- **HomeActivity ↔ Firestore**  
+  Recupera as viagens do utilizador autenticado e exibe-as usando o ViagemAdapter.
+
+- **CriarViagemActivity / EditarViagemActivity ↔ Firestore + Room**  
+  Permite criar ou modificar viagens. As imagens associadas podem ser guardadas localmente (Room) e na cloud (Storage).
+
+- **FotosViagemActivity ↔ Room + Firebase Storage**
+  Mostra as imagens guardadas localmente, sincroniza com a cloud e permite adicionar novas fotos a partir da galeria.
+
+- **Offline:**
+  Quando o utilizador está offline, as imagens são guardadas no Room e sincronizadas com o Firestore/Storage assim que houver ligação à internet.
+
 ---
 
 ## 📦 Dependências e Tecnologias
