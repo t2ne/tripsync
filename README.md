@@ -22,7 +22,7 @@ O TripSync foi criado a pensar em viajantes que pretendem organizar facilmente v
 ```
 TripSync
 ├── Activities
-│   ├── MainActivity (Login)
+│   ├── LoginActivity
 │   ├── RegisterActivity
 │   ├── HomeActivity (Lista de Viagens)
 │   ├── CriarViagemActivity
