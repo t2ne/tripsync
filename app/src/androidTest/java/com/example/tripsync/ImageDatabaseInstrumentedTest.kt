@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ImageDatabaseTest {
+class ImageDatabaseInstrumentedTest {
     private lateinit var imageDao: ImageDao
     private lateinit var db: AppDatabase
 

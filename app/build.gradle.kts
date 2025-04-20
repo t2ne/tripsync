@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.core.ktx)
     ksp(libs.androidx.room.compiler)
 
     // para os items
@@ -83,4 +84,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
+    testImplementation(kotlin("test"))
 }

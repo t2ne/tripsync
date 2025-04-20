@@ -47,15 +47,16 @@ object ImageUtils {
     fun getImageUriFromPath(context: Context, path: String): Uri {
         val file = File(path)
         return if (file.exists()) {
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file
-            )
+            try {
+                FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            } catch (e: IllegalArgumentException) {
+                Uri.EMPTY
+            }
         } else {
             Uri.EMPTY
         }
     }
+
 
     // ir buscar o caminho da imagem no room
     suspend fun getImagePath(context: Context, id: String, type: String): String? = withContext(Dispatchers.IO) {
