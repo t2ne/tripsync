@@ -125,4 +125,11 @@
     <string name="a_processar_fotos">Processing photos...</string>
     <string name="fotos_adicionadas_com_sucesso">Photos added successfully</string>
     <string name="erro_ao_processar_fotos">Error processing photos:</string>
+    <string name="proximo">Next</string>
+    <string name="bem_vindo_ao_tripsync">Welcome to TripSync!</string>
+    <string name="a_unica_aplicacao_que">The only app you will need to manage your trips.</string>
+    <string name="farto_de_confusoes">Tired of confusion?</string>
+    <string name="tu_decides_o_que_fazer">You decide what to do, we help you organize it.</string>
+    <string name="estas_pronto">Are you ready?</string>
+    <string name="a_tua_jornada_comeca_aqui">Your journey starts here!</string>
 </resources>

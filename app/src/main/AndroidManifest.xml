@@ -4,12 +4,11 @@
     tools:ignore="SelectedPhotoAccess">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
         tools:ignore="SelectedPhotoAccess" />
 
     <application
@@ -23,35 +22,32 @@
         android:theme="@style/Base.Theme.Tripsync">
 
         <activity
+            android:name=".ui.IntroActivity"
+            android:exported="true" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.LoginActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.RegisterActivity"
             android:exported="true" />
-
         <activity
             android:name=".ui.HomeActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.EditarPerfilActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.CriarViagemActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.EditarViagemActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.FotosViagemActivity"
             android:exported="false" />

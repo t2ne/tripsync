@@ -124,4 +124,11 @@
     <string name="a_processar_fotos">A processar fotos...</string>
     <string name="fotos_adicionadas_com_sucesso">Fotos adicionadas com sucesso</string>
     <string name="erro_ao_processar_fotos">Erro ao processar fotos:</string>
+    <string name="proximo">Próximo</string>
+    <string name="bem_vindo_ao_tripsync">Bem-vindo ao TripSync!</string>
+    <string name="a_unica_aplicacao_que">A única aplicação que precisas para gerir as tuas viagens.</string>
+    <string name="farto_de_confusoes">Farto de confusões?</string>
+    <string name="tu_decides_o_que_fazer">Tu decides o que fazer, nós ajudamos-te a organizar.</string>
+    <string name="estas_pronto">Estás pronto?</string>
+    <string name="a_tua_jornada_comeca_aqui">A tua jornada começa aqui!</string>
 </resources>

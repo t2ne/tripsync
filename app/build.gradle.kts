@@ -59,12 +59,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // firebase stuff
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage.ktx)
+
+    //intro sliders
+    implementation(libs.androidx.viewpager2)
 
     // room
     implementation(libs.androidx.room.runtime)

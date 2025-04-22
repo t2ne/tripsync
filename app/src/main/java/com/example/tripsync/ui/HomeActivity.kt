@@ -71,7 +71,7 @@ class HomeActivity : AppCompatActivity() {
         // btn FILTROS +
         setupFiltros()
 
-        // Ícone de perfil abre EditarPerfilActivity
+        // Ícone de profile abre EditarPerfilActivity
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
         profileIcon.setOnClickListener {
             val intent = Intent(this, EditarPerfilActivity::class.java)
