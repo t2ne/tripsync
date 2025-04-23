@@ -6,11 +6,8 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.tripsync.R
 import com.example.tripsync.adapters.IntroSliderAdapter
@@ -20,16 +17,18 @@ class IntroActivity : AppCompatActivity() {
     private lateinit var introViewPager: ViewPager2
     private lateinit var indicatorsContainer: LinearLayout
     private lateinit var btnNext: Button
+
+    // chave para armazenar se a intro foi mostrada
     private val PREF_NAME = "MyAppPrefs"
     private val INTRO_SHOWN_KEY = "intro_shown"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verificar se a introdução já foi mostrada
+        // ... verify para ver se a intro já foi mostrada
         val sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         if (sharedPreferences.getBoolean(INTRO_SHOWN_KEY, false)) {
-            startMainActivity()
+            startLoginActivity()
             return
         }
 
@@ -39,7 +38,7 @@ class IntroActivity : AppCompatActivity() {
         indicatorsContainer = findViewById(R.id.indicatorsContainer)
         btnNext = findViewById(R.id.btnNext)
 
-        // Configurar o adaptador
+        // config do adapter
         val adapter = IntroSliderAdapter(this)
         introViewPager.adapter = adapter
 
@@ -51,27 +50,29 @@ class IntroActivity : AppCompatActivity() {
                 super.onPageSelected(position)
                 updateIndicators(position)
 
-                // Mudar texto do botão no último slide
+                // change do text no último slide (match para o array)
                 if (position == adapter.itemCount - 1) {
-                    btnNext.text = "Começar"
+                    btnNext.text = getString(R.string.comecar)
                 } else {
-                    btnNext.text = "Próximo"
+                    btnNext.text = getString(R.string.proximo)
                 }
             }
         })
 
         btnNext.setOnClickListener {
             if (introViewPager.currentItem == adapter.itemCount - 1) {
-                // Último slide, marcar como visualizado e iniciar atividade principal
+                // ... last slide, marcar como visto e init do login
+                // é de lembrar q dá skip do login se já tiver logado
                 sharedPreferences.edit().putBoolean(INTRO_SHOWN_KEY, true).apply()
-                startMainActivity()
+                startLoginActivity()
             } else {
-                // Avançar para o próximo slide
+                // next slide otherwise
                 introViewPager.currentItem++
             }
         }
     }
 
+    // setup dos indicators
     private fun setupIndicators(count: Int) {
         val indicators = arrayOfNulls<ImageView>(count)
         val params = LinearLayout.LayoutParams(
@@ -81,6 +82,7 @@ class IntroActivity : AppCompatActivity() {
             setMargins(8, 0, 8, 0)
         }
 
+        // mudar a cor do indicator dependendo da posição (no setup), isto é ir buscar
         for (i in 0 until count) {
             indicators[i] = ImageView(this)
             indicators[i]?.setImageDrawable(
@@ -91,6 +93,7 @@ class IntroActivity : AppCompatActivity() {
         }
     }
 
+    // ... update dos indicators dependendo da pos dependendo se é o ativo ou não
     private fun updateIndicators(position: Int) {
         for (i in 0 until indicatorsContainer.childCount) {
             val imageView = indicatorsContainer.getChildAt(i) as ImageView
@@ -106,7 +109,8 @@ class IntroActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMainActivity() {
+    // intent pro login
+    private fun startLoginActivity() {
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
