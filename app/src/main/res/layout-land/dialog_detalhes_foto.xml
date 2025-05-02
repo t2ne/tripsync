@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#FFFFFF"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.RegisterActivity"
     android:layout_marginHorizontal="70dp">
@@ -70,7 +69,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/local"
-        android:layout_marginTop="8dp" />
+        android:layout_marginStart="4dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="16dp" />
 
     <Spinner
         android:id="@+id/spinnerLocal"
@@ -93,6 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/excluir"
+            style="@style/TEXT"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#FF5252" />
 
@@ -100,6 +102,7 @@
             android:id="@+id/btnSalvarDetalhesFoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/TEXT"
             android:text="@string/salvar" />
     </LinearLayout>
 </LinearLayout>

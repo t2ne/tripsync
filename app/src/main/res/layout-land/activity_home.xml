@@ -2,7 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.HomeActivity"
     android:layout_marginHorizontal="75dp"
@@ -17,6 +16,7 @@
         android:layout_marginEnd="30dp"
         android:layout_marginTop="30dp"
         android:src="@drawable/profile"
+        app:tint="@color/black"
         android:contentDescription="@string/perfil" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="@string/viagens_allcaps"
-        android:textColor="#000000"
+        style="@style/TEXT"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/filtros"
-            android:textColor="#000000"
+            style="@style/TEXT2"
             android:background="@drawable/border_button"
             android:layout_marginEnd="8dp" />
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/criar_allcaps"
-            android:textColor="#000000"
+            style="@style/TEXT2"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
             android:background="@drawable/border_button"
@@ -69,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonContainer"
         android:layout_marginHorizontal="70dp"
+        style="@style/TEXT"
         android:layout_marginTop="22dp"
         android:visibility="gone" />
 
@@ -76,6 +77,7 @@
         android:id="@+id/viagensRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        style="@style/TEXT"
         android:layout_below="@id/spinnerFiltro"
         android:layout_marginTop="16dp"/>
 </RelativeLayout>

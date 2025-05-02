@@ -82,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/excluir"
+            style="@style/TEXT"
             android:layout_marginEnd="8dp"
             android:backgroundTint="#FF5252" />
 
@@ -89,6 +90,7 @@
             android:id="@+id/btnSalvarDetalhesFoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/TEXT"
             android:text="@string/salvar" />
     </LinearLayout>
 

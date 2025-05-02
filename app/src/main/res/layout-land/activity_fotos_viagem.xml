@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     tools:context=".ui.FotosViagemActivity"
     android:layout_marginHorizontal="70dp"
     android:padding="20dp">
@@ -12,7 +12,6 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#F5F5F5"
         android:elevation="4dp">
 
         <ImageView
@@ -22,7 +21,8 @@
             android:padding="12dp"
             android:layout_centerVertical="true"
             android:src="@drawable/back"
-            android:contentDescription="@string/voltar" />
+            android:contentDescription="@string/voltar"
+            app:tint="@color/black"/>
     </RelativeLayout>
 
     <Button
@@ -34,6 +34,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/adicionar_fotos"
+        style="@style/TEXT"
         android:drawableStart="@android:drawable/ic_input_add"
         android:drawablePadding="8dp"
         android:gravity="center" />

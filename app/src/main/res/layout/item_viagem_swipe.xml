@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
@@ -26,14 +26,14 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                style="@style/TEXT"/>
 
             <TextView
                 android:id="@+id/dataViagem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="#666666"
+                style="@style/TEXT"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
@@ -44,6 +44,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_share"
+            app:tint="@color/black"
             android:contentDescription="@string/compartilhar_viagem" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="#FFFFFF"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.RegisterActivity">
 
@@ -14,7 +14,8 @@
         android:layout_marginTop="16dp"
         android:layout_gravity="start|top"
         android:contentDescription="@string/voltar"
-        android:src="@drawable/back" />
+        android:src="@drawable/back"
+        app:tint="@color/black"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,12 +28,14 @@
             android:layout_height="100dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/profile"
+            app:tint="@color/black"
             android:contentDescription="@string/icone_utilizador" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/registo"
+            style="@style/TEXT"
             android:textStyle="bold"
             android:textSize="24sp"
             android:layout_marginTop="8dp" />
@@ -43,7 +46,6 @@
             android:layout_height="wrap_content"
             android:autofillHints="name"
             android:hint="@string/nome"
-            android:background="#eeeeee"
             android:inputType="text"
             android:padding="12dp"
             android:layout_marginTop="12dp"
@@ -55,7 +57,6 @@
             android:layout_height="wrap_content"
             android:autofillHints="username"
             android:hint="@string/username"
-            android:background="#eeeeee"
             android:inputType="text"
             android:padding="12dp"
             android:layout_marginTop="24dp"
@@ -67,7 +68,6 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:hint="@string/email"
-            android:background="#eeeeee"
             android:inputType="textEmailAddress"
             android:padding="12dp"
             android:layout_marginTop="24dp" />
@@ -79,7 +79,6 @@
             android:autofillHints="password"
             android:hint="@string/password"
             android:inputType="textPassword"
-            android:background="#eeeeee"
             android:padding="12dp"
             android:layout_marginTop="12dp" />
 
@@ -90,6 +89,6 @@
             android:text="@string/registar_allcaps"
             android:layout_marginTop="24dp"
             android:backgroundTint="#1976D2"
-            android:textColor="#FFFFFF" />
+            style="@style/TEXT"/>
     </LinearLayout>
 </FrameLayout>

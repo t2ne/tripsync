@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.EditarPerfilActivity"
     android:layout_marginHorizontal="70dp"
@@ -21,7 +21,8 @@
             android:layout_marginTop="16dp"
             android:layout_gravity="start|top"
             android:contentDescription="@string/voltar"
-            android:src="@drawable/back" />
+            android:src="@drawable/back"
+            app:tint="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -53,6 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/selecionar_foto"
+                style="@style/TEXT"
                 android:layout_marginEnd="8dp" />
 
             <Button
@@ -60,6 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/remover_foto"
+                style="@style/TEXT"
                 android:backgroundTint="@color/colorAccent" />
         </LinearLayout>
 
@@ -99,6 +102,7 @@
         <Button
             android:id="@+id/btnSalvar"
             android:text="@string/salvar"
+            style="@style/TEXT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -109,6 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/terminar_sessao"
+            style="@style/TEXT"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="70dp"

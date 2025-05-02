@@ -12,8 +12,7 @@
         android:id="@+id/itemContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:background="?attr/selectableItemBackground">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,14 +26,14 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                style="@style/TEXT"/>
 
             <TextView
                 android:id="@+id/dataViagem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="#666666"
+                style="@style/TEXT"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
@@ -45,6 +44,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_share"
+            app:tint="@color/black"
             android:contentDescription="@string/compartilhar_viagem" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
