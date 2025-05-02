@@ -21,22 +21,30 @@ O TripSync foi criado a pensar em viajantes que pretendem organizar facilmente v
 
 ```
 TripSync
+│
 ├── UI
 │   ├── LoginActivity
 │   ├── RegisterActivity
 │   ├── HomeActivity (Lista de Viagens)
 │   ├── CriarViagemActivity
+│   ├── IntroActivity
 │   ├── EditarViagemActivity
 │   ├── EditarPerfilActivity
 │   └── FotosViagemActivity
+│
 ├── Adapters
 │   ├── ViagemAdapter
+│   ├── IntroSliderAdapter
 │   └── FotosAdapter
+│
 ├── Models
 │   ├── Viagem
+│   ├── IntroSlide
 │   └── FotoViagem
+│
 ├── Utils
 │   └── ImageUtils
+│
 └── Database
     ├── AppDatabase
     ├── ImageDao  
